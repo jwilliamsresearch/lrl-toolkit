@@ -16,6 +16,7 @@ from . import review as review_mod
 from .instruction_sets import load_instruction_set
 from .schema import chat_pair, instruction_of, write_jsonl
 from .teacher import get_teacher
+from .translators import get_translator
 
 log = get_logger("lrl.convdata")
 
@@ -38,7 +39,8 @@ class ConvDataStage(Stage):
 
     def run(self, ctx: StageContext) -> StageResult:
         cfg = ctx.project.config.convdata
-        lang_name = ctx.project.language_profile.display_name
+        lang = ctx.project.language_profile
+        lang_name = lang.display_name
         out_dir = ctx.stage_dir(self.name)
         clean_dir = ctx.project.stage_dir("clean") / "corpus"
 
@@ -46,12 +48,18 @@ class ConvDataStage(Stage):
 
         # --- translate open instruction datasets ------------------------- #
         if cfg.translate:
-            translator = get_teacher(cfg.provider, cfg.model)
+            translator = get_translator(
+                cfg.translate_backend,
+                cfg.translate_model,
+                teacher_provider=cfg.provider,
+                teacher_model=cfg.model,
+            )
+            log.info("[convdata] translating with backend=%s", cfg.translate_backend)
             for ds_name in cfg.translate:
                 count = 0
                 for ex in load_instruction_set(ds_name, limit=cfg.translate_limit):
-                    instr = translator.translate(ex["instruction"], lang_name)
-                    resp = translator.translate(ex["response"], lang_name)
+                    instr = translator.translate(ex["instruction"], lang)
+                    resp = translator.translate(ex["response"], lang)
                     pairs.append(chat_pair(instr, resp, source=f"translate:{ds_name}"))
                     count += 1
                 log.info("[convdata] translated %d from %s", count, ds_name)
@@ -87,6 +95,7 @@ class ConvDataStage(Stage):
         card = {
             "language": lang_name,
             "translate_datasets": cfg.translate,
+            "translate_backend": cfg.translate_backend if cfg.translate else None,
             "provider": cfg.provider,
             "synth": cfg.synth.model_dump(mode="json") if cfg.synth else None,
             "review": cfg.review,

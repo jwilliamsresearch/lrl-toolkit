@@ -1,6 +1,7 @@
 display_name: Sorani Kurdish
 iso639_3: ckb
 iso639_1: null
+nllb_code: ckb_Arab
 scripts: [Arabic]
 default_script: Arabic
 direction: rtl

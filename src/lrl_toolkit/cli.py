@@ -192,9 +192,10 @@ pretrain:
   seq_len: 2048
 
 convdata:
-  translate: [dolly]
+  translate: [dolly]         # instruction sets: dolly/alpaca/oasst1 or a local path
   translate_limit: 500
-  provider: ollama          # local teacher LLM (ollama/local/mock); no proprietary APIs
+  translate_backend: nllb    # MT backend: nllb/m2m100/opusmt/madlad/teacher/mock
+  provider: ollama           # local teacher for synth (ollama/local/mock); no proprietary APIs
   synth:
     provider: ollama
     n: 2000

@@ -54,6 +54,9 @@ class LanguageProfile(BaseModel):
     display_name: str = Field(..., description="Human-readable name, e.g. 'Kurmanji Kurdish'.")
     iso639_3: str = Field(..., description="ISO 639-3 code, e.g. 'kmr'.")
     iso639_1: str | None = Field(default=None, description="ISO 639-1 code if one exists.")
+    nllb_code: str | None = Field(
+        default=None, description="NLLB-200 FLORES code, e.g. 'cym_Latn'. None if unsupported."
+    )
     scripts: list[str] = Field(..., min_length=1, description="Scripts, e.g. ['Latin'].")
     default_script: str | None = Field(default=None, description="Primary script if multiple.")
     direction: TextDirection = TextDirection.ltr

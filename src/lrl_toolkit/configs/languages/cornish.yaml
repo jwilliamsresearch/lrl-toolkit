@@ -1,6 +1,7 @@
 display_name: Cornish
 iso639_3: cor
 iso639_1: kw
+nllb_code: null   # Cornish is not in NLLB-200; use a teacher LLM to translate
 scripts: [Latin]
 default_script: Latin
 direction: ltr

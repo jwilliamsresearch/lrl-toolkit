@@ -64,18 +64,32 @@ Gated sources need a Hugging Face token: `export HF_TOKEN=hf_...` (or
 its license; **export is blocked until all licenses resolve** (see
 [DATA_ETHICS.md](DATA_ETHICS.md)).
 
-### Conversational data (teacher LLMs)
+### Conversational data
 
-The `convdata` stage builds instruction/chat pairs by translating open
-instruction sets and synthesizing native pairs with a **teacher LLM**. Only
-**local / open-weight teachers** are supported — proprietary hosted APIs (Claude,
-OpenAI, Gemini) prohibit using their outputs to train other models:
+The `convdata` stage builds instruction/chat pairs three ways, mixed per project:
+**translate** open instruction sets, **synthesize** native pairs with a teacher
+LLM, and **review** them. Everything runs on **local / open-weight models** —
+proprietary hosted APIs (Claude, OpenAI, Gemini) prohibit using their outputs to
+train other models, so they are not offered.
+
+**Translation backends** (`translate_backend`) — pick per language:
+
+| Backend | Model | Notes |
+|---------|-------|-------|
+| `nllb` | NLLB-200 (600M default) | **Recommended for LRLs.** 200+ languages; best quality/size |
+| `m2m100` | M2M-100 (418M) | 100 languages; small/fast |
+| `opusmt` | Helsinki-NLP OPUS-MT | One tiny model per language pair (not all pairs exist) |
+| `madlad` | MADLAD-400 (3B) | 400+ languages; large |
+| `teacher` | the synth teacher LLM | Reuse Ollama/local; convenient but weaker on LRLs |
+| `mock` | — | Offline/CI |
+
+**Synth teacher** (`provider`) — local LLM that generates native pairs:
 
 | Provider | Backend | Notes |
 |----------|---------|-------|
 | `ollama` | local Ollama server | **Recommended.** Free, no key. `ollama pull qwen2.5:7b` |
 | `local` | transformers model | Runs an open HF model in-process |
-| `mock` | deterministic | Offline/CI; no model |
+| `mock` | deterministic | Offline/CI |
 
 Generated pairs pass through an optional **human review** queue (native speakers
 accept/edit/reject) before fine-tuning — see [DATA_ETHICS.md](DATA_ETHICS.md).
@@ -111,7 +125,7 @@ lrl pretrain -c projects/welsh.yaml
 - **M0 — Scaffolding** ✅: package, config schemas, manifest, CLI, registry, governance docs.
 - **M1 — Data path** ✅: 10 ingest connectors (Wikipedia, Glot500, CulturaX, MADLAD-400, OSCAR, Common Crawl, OPUS/NLLB, SMOL, FLORES, local) + full clean stage (normalize, language-ID, dedup, quality filters, PII).
 - **M2 — Model path** ✅: tokenizer extension (fertility-reported) + LoRA/QLoRA continued pretraining, with automatic QLoRA→LoRA fallback when there's no GPU.
-- **M3 — Conversational + SFT** ✅: translate + synth (local/Ollama teacher) + review queue + SFT via TRL.
+- **M3 — Conversational + SFT** ✅: translate (NLLB/M2M-100/OPUS-MT/MADLAD/teacher) + synth (Ollama/local) + review queue + SFT via TRL.
 - **M4 — Evaluate + export** ✅: held-out perplexity report card, LoRA merge, Ollama Modelfile, HF model card (best-effort GGUF via llama.cpp).
 - **M5 — Dashboard** *(next)*: wizard, run monitor, review queue, chat.
 - **M6 — Launch**: docs, tutorials for the seed languages, CI, first release.

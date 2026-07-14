@@ -114,6 +114,10 @@ class ConvDataConfig(BaseModel):
     translate_limit: int | None = Field(
         default=500, description="Max examples to translate per dataset."
     )
+    translate_backend: str = Field(
+        default="nllb", description="MT backend: nllb/m2m100/opusmt/madlad/teacher/mock."
+    )
+    translate_model: str | None = Field(default=None, description="Override the MT model.")
     provider: str = Field(default="ollama", description="Local teacher: ollama/local/mock.")
     model: str | None = Field(default=None, description="Override the provider's default model.")
     synth: SynthConfig | None = None

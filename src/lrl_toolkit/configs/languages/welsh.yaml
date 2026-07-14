@@ -1,6 +1,7 @@
 display_name: Welsh
 iso639_3: cym
 iso639_1: cy
+nllb_code: cym_Latn
 scripts: [Latin]
 default_script: Latin
 direction: ltr

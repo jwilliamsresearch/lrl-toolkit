@@ -1,6 +1,7 @@
 display_name: Persian (Farsi)
 iso639_3: fas
 iso639_1: fa
+nllb_code: pes_Arab
 scripts: [Arabic]
 default_script: Arabic
 direction: rtl

@@ -1,6 +1,7 @@
 display_name: Kurmanji Kurdish
 iso639_3: kmr
 iso639_1: ku
+nllb_code: kmr_Latn
 scripts: [Latin]
 default_script: Latin
 direction: ltr

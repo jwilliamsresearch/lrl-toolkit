@@ -8,7 +8,9 @@ from lrl_toolkit.config import load_project
 from lrl_toolkit.convdata import review as review_mod
 from lrl_toolkit.convdata.schema import instruction_of, read_jsonl, to_messages
 from lrl_toolkit.convdata.teacher import get_teacher
+from lrl_toolkit.convdata.translators import available_backends, get_translator
 from lrl_toolkit.pipeline import run_pipeline
+from lrl_toolkit.registry import load_language
 
 
 def test_mock_teacher_generate_and_translate():
@@ -25,6 +27,21 @@ def test_proprietary_providers_are_rejected():
     for provider in ("claude", "openai", "gemini"):
         with pytest.raises(ValueError):
             get_teacher(provider)
+
+
+def test_translator_backends_registered_and_mock_works():
+    assert set(available_backends()) >= {"nllb", "m2m100", "opusmt", "madlad", "teacher", "mock"}
+    welsh = load_language("welsh")
+    assert welsh.nllb_code == "cym_Latn"
+    out = get_translator("mock").translate("hello world", welsh)
+    assert out.startswith("[Welsh]")
+
+
+def test_unknown_translator_backend_raises():
+    import pytest
+
+    with pytest.raises(ValueError):
+        get_translator("googletranslate")
 
 
 def test_schema_and_review_flow():
@@ -83,7 +100,12 @@ def test_convdata_translate_local_jsonl(tmp_path, offline_configs):
     proj = _project(
         tmp_path,
         offline_configs,
-        {"provider": "mock", "translate": [str(seed)], "translate_limit": 10, "review": False},
+        {
+            "translate": [str(seed)],
+            "translate_limit": 10,
+            "translate_backend": "mock",
+            "review": False,
+        },
     )
     run_pipeline(proj, stages=["ingest", "clean", "convdata"])
     accepted = read_jsonl(proj.stage_dir("convdata") / "accepted.jsonl")
