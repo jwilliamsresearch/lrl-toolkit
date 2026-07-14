@@ -6,7 +6,7 @@ Take a language from *"here is an ISO code"* to *"here is a fine-tuned, evaluate
 
 Built for the messy reality of LRLs — Kurmanji/Sorani Kurdish, Welsh, Cornish, Farsi, and beyond — where corpora are scattered, scripts and dialects vary, and instruction data barely exists.
 
-> **Status:** Alpha (M0 scaffolding). The pipeline skeleton, config system, registry, and CLI run today; individual stages are being filled in. See [the roadmap](#roadmap).
+> **Status:** Alpha (M2 — model path). The config system, registry, CLI, **ingest connectors, clean stage, tokenizer extension, and continued pretraining** work today against live data. Conversational-data + fine-tuning are next. See [the roadmap](#roadmap).
 
 ---
 
@@ -40,6 +40,30 @@ registry ─▶ ingest ─▶ clean ─▶ tokenizer ─▶ pretrain ─┐
 | **evaluate** | model report card (perplexity, chrF/FLORES, Belebele, judge) |
 | **export** | merged/quantized weights (GGUF/Ollama) + HF model card |
 
+## Data sources
+
+The ingest stage ships connectors for the major LRL corpora. Each is a small
+class implementing `BaseConnector`; sources for a language are declared in its
+profile's catalog (`lrl sources list <lang>`).
+
+| Connector | Source | Type | Notes |
+|-----------|--------|------|-------|
+| `wikipedia` | `wikimedia/wikipedia` | mono | Per-language Wikipedia dumps |
+| `glot500` | `cis-lmu/Glot500` | mono | 500+ under-resourced languages |
+| `culturax` | `uonlp/CulturaX` | mono | Cleaned mC4 + OSCAR (may need HF token) |
+| `madlad400` | `allenai/madlad-400` | mono | Google's audited 419-language set |
+| `oscar` | `oscar-corpus/OSCAR-2301` | mono | **Gated** — accept license + set `HF_TOKEN` |
+| `commoncrawl` | raw CDX + WARC | mono | Target specific domains; language-filtered in `clean` |
+| `opus` | `opus.nlpl.eu` API | parallel | Aggregates **NLLB**, OpenSubtitles, Tatoeba, bible… |
+| `smol` | `google/smol` | parallel | GATITOS/SmolSent/SmolDoc for 100+ LRLs |
+| `flores` | `openlanguagedata/flores_plus` | parallel | **Gated** — FLORES-200 eval/seed data |
+| `local` | your filesystem | mono | `.txt/.jsonl(.gz)/.md/.html/.pdf`; the offline path |
+
+Gated sources need a Hugging Face token: `export HF_TOKEN=hf_...` (or
+`huggingface-cli login`). Every fetched source records a `ProvenanceRecord` with
+its license; **export is blocked until all licenses resolve** (see
+[DATA_ETHICS.md](DATA_ETHICS.md)).
+
 ## Install
 
 ```bash
@@ -68,10 +92,10 @@ lrl pretrain -c projects/welsh.yaml
 
 ## Roadmap
 
-- **M0 — Scaffolding** *(current)*: package, config schemas, manifest, CLI, registry, governance docs.
-- **M1 — Data path**: ingest connectors (Wikipedia, OSCAR/HF, OPUS, Leipzig, local) + full clean stage.
-- **M2 — Model path**: tokenizer extension + QLoRA continued pretraining.
-- **M3 — Conversational + SFT**: translate + synth + review + SFT → a working Welsh chat model.
+- **M0 — Scaffolding** ✅: package, config schemas, manifest, CLI, registry, governance docs.
+- **M1 — Data path** ✅: 10 ingest connectors (Wikipedia, Glot500, CulturaX, MADLAD-400, OSCAR, Common Crawl, OPUS/NLLB, SMOL, FLORES, local) + full clean stage (normalize, language-ID, dedup, quality filters, PII).
+- **M2 — Model path** ✅: tokenizer extension (fertility-reported) + LoRA/QLoRA continued pretraining, with automatic QLoRA→LoRA fallback when there's no GPU.
+- **M3 — Conversational + SFT** *(next)*: translate + synth + review + SFT → a working Welsh chat model.
 - **M4 — Evaluate + export**: report card, GGUF/Ollama, HF model card.
 - **M5 — Dashboard**: wizard, run monitor, review queue, chat.
 - **M6 — Launch**: docs, tutorials for the seed languages, CI, first release.

@@ -38,6 +38,10 @@ dependencies = [
 # Data ingestion + cleaning stack.
 data = [
     "datasets>=2.18",
+    "huggingface_hub>=0.23",
+    "requests>=2.31",
+    "warcio>=1.7",
+    "zstandard>=0.22",
     "trafilatura>=1.8",
     "jusText>=3.0",
     "pymupdf>=1.24",

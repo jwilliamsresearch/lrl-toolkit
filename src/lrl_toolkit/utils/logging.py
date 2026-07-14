@@ -36,6 +36,12 @@ def _configure_root() -> None:
         handler = logging.StreamHandler()
         fmt = "%(asctime)s %(levelname)s %(name)s: %(message)s"
     logging.basicConfig(level=logging.INFO, format=fmt, handlers=[handler], force=True)
+    # Quiet chatty third-party libraries (HTTP requests, Hub, dataset builders).
+    for noisy in (
+        "httpx", "httpcore", "urllib3", "filelock", "fsspec",
+        "huggingface_hub", "datasets", "requests",
+    ):
+        logging.getLogger(noisy).setLevel(logging.WARNING)
     _CONFIGURED = True
 
 

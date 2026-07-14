@@ -14,10 +14,20 @@ sources:
   - connector: wikipedia
     params: {wiki: ckb, license: CC-BY-SA-4.0, url: "https://ckb.wikipedia.org"}
     notes: Central Kurdish (Sorani, Arabic script) Wikipedia.
+  - connector: glot500
+    params: {glot: ckb_Arab, license: mixed}
+  - connector: culturax
+    params: {lang: ckb, license: ODC-BY-1.0}
+  - connector: madlad400
+    params: {lang: ckb, variant: clean, license: ODC-BY-1.0}
   - connector: oscar
     params: {lang: ckb, license: CC0-1.0}
-  - connector: leipzig
-    params: {lang: ckb, license: CC-BY-NC-4.0}
+    notes: OSCAR-2301 — GATED; set HF_TOKEN.
+  - connector: opus
+    params: {src: ckb, tgt: en, corpora: [OpenSubtitles, Tatoeba, NLLB], license: mixed}
+  - connector: flores
+    params: {flores: ckb_Arab, license: CC-BY-SA-4.0}
+    notes: GATED; set HF_TOKEN.
 notes: >
   Right-to-left Arabic script with Kurdish-specific letters. Character
   normalization (ک vs ك, ی vs ي, ە) is essential — see the sorani_arabic rules.

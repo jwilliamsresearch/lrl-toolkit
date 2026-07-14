@@ -14,12 +14,20 @@ sources:
   - connector: wikipedia
     params: {wiki: fa, license: CC-BY-SA-4.0, url: "https://fa.wikipedia.org"}
     notes: Persian Wikipedia — large.
+  - connector: glot500
+    params: {glot: fas_Arab, license: mixed}
+  - connector: culturax
+    params: {lang: fa, license: ODC-BY-1.0}
+  - connector: madlad400
+    params: {lang: fa, variant: clean, license: ODC-BY-1.0}
   - connector: oscar
     params: {lang: fa, license: CC0-1.0}
+    notes: OSCAR-2301 — GATED; set HF_TOKEN.
   - connector: opus
-    params: {corpora: [OpenSubtitles, Tatoeba], src: fa, license: mixed}
-  - connector: leipzig
-    params: {lang: fas, license: CC-BY-NC-4.0}
+    params: {src: fa, tgt: en, corpora: [OpenSubtitles, Tatoeba, NLLB], license: mixed}
+  - connector: flores
+    params: {flores: pes_Arab, license: CC-BY-SA-4.0}
+    notes: GATED; set HF_TOKEN.
 notes: >
   Persian is mid-resource, not truly low-resource, but is a useful bridge/target
   and shares Arabic-script normalization needs with Sorani. Correct ZWNJ (نیم‌فاصله)

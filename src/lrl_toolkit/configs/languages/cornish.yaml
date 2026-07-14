@@ -14,13 +14,18 @@ sources:
   - connector: wikipedia
     params: {wiki: kw, license: CC-BY-SA-4.0, url: "https://kw.wikipedia.org"}
     notes: Cornish Wikipedia — small; expect a very low-resource run.
+  - connector: glot500
+    params: {glot: cor_Latn, license: mixed}
+  - connector: madlad400
+    params: {lang: kw, variant: clean, license: ODC-BY-1.0}
   - connector: opus
-    params: {corpora: [Tatoeba, bible-uedin], src: kw, license: mixed}
+    params: {src: kw, tgt: en, corpora: [Tatoeba, bible-uedin], license: mixed}
   - connector: local
     params: {path: null, license: unknown}
     notes: >
       Cornish is revived and extremely low-resource; community-contributed local
-      texts (with permission) matter a lot. Point `path` at a directory.
+      texts (with permission) matter a lot. Point `path` at a directory. Note the
+      unknown license blocks export until you resolve it (see DATA_ETHICS.md).
 notes: >
   A genuinely tiny-corpus case. Use aggressive tokenizer extension and lean on
   translated + synthetic conversational data. Involve the Cornish language

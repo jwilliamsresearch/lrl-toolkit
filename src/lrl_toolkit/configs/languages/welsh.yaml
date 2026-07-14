@@ -9,20 +9,35 @@ dialects: [Northern, Southern]
 normalization:
   unicode_form: NFC
   normalize_digits: false
-  rules: [welsh_digraphs]   # treat ch, dd, ff, ng, ll, ph, rh, th as units where relevant
+  rules: [welsh_digraphs]
 sources:
+  # --- monolingual: curated Common Crawl derivatives + Wikipedia ---
   - connector: wikipedia
     params: {wiki: cy, license: CC-BY-SA-4.0, url: "https://cy.wikipedia.org"}
     notes: Welsh Wikipedia — sizeable and high quality for an LRL.
+  - connector: glot500
+    params: {glot: cym_Latn, license: mixed}
+    notes: Glot500 web corpus (500+ under-resourced languages).
+  - connector: culturax
+    params: {lang: cy, license: ODC-BY-1.0}
+    notes: CulturaX (cleaned mC4 + OSCAR). May require accepting terms + HF_TOKEN.
+  - connector: madlad400
+    params: {lang: cy, variant: clean, license: ODC-BY-1.0}
+    notes: Google MADLAD-400, document-level, audited/filtered.
   - connector: oscar
     params: {lang: cy, license: CC0-1.0}
-    notes: Web text (CommonCrawl-derived).
+    notes: OSCAR-2301 — GATED; accept the license and set HF_TOKEN.
+  # --- raw Common Crawl (language-filter in the clean stage) ---
+  - connector: commoncrawl
+    params: {url_pattern: "cy.wikipedia.org/*", license: "Common-Crawl-ToU"}
+    notes: Raw CC via CDX index + WARC range fetch. Target specific domains.
+  # --- parallel / translation (feeds MT + conversational data) ---
   - connector: opus
-    params: {corpora: [OpenSubtitles, Tatoeba, bible-uedin], src: cy, license: mixed}
-    notes: Parallel + monolingual; good for MT and dialogue seeds.
-  - connector: leipzig
-    params: {lang: cym, license: CC-BY-NC-4.0}
-    notes: Leipzig Corpora news/web packages.
+    params: {src: cy, tgt: en, corpora: [OpenSubtitles, Tatoeba, NLLB, bible-uedin], license: mixed}
+    notes: OPUS aggregates OpenSubtitles, Tatoeba, NLLB, bible, and more.
+  - connector: flores
+    params: {flores: cym_Latn, license: CC-BY-SA-4.0}
+    notes: FLORES+ eval/seed data — GATED; accept the license and set HF_TOKEN.
 notes: >
-  Welsh is comparatively well-resourced among LRLs, which makes it the reference
+  Welsh is comparatively well-resourced among LRLs, so it is the reference
   language for the smoke pipeline and tutorials.
