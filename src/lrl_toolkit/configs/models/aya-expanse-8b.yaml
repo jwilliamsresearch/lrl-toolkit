@@ -1,0 +1,9 @@
+hf_id: CohereLabs/aya-expanse-8b
+family: aya
+arch: decoder
+tokenizer_type: bpe
+context_length: 8192
+good_for_lrl: true
+notes: >
+  Aya Expanse (8B), Cohere's multilingual model; broad language coverage makes it
+  a good LRL adaptation base. Gated (CC-BY-NC).

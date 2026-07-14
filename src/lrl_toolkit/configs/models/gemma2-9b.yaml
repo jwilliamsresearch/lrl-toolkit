@@ -1,0 +1,7 @@
+hf_id: google/gemma-2-9b
+family: gemma
+arch: decoder
+tokenizer_type: sentencepiece
+context_length: 8192
+good_for_lrl: true
+notes: 9B Gemma 2 with a 256k SentencePiece vocab (broad multilingual coverage). Gated.

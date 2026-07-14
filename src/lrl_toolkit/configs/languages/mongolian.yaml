@@ -1,0 +1,51 @@
+display_name: Mongolian
+iso639_3: mon
+iso639_1: mn
+nllb_code: khk_Cyrl
+scripts:
+- Cyrillic
+default_script: Cyrillic
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: mn
+    license: CC-BY-SA-4.0
+    url: https://mn.wikipedia.org
+- connector: glot500
+  params:
+    glot: mon_Cyrl
+    license: mixed
+- connector: culturax
+  params:
+    lang: mn
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: mn
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: mn
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: mn
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: khk_Cyrl
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

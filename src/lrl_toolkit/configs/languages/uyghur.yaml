@@ -1,0 +1,52 @@
+display_name: Uyghur
+iso639_3: uig
+iso639_1: ug
+nllb_code: uig_Arab
+scripts:
+- Arabic
+default_script: Arabic
+direction: rtl
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: true
+  rules:
+  - arabic_presentation_forms
+sources:
+- connector: wikipedia
+  params:
+    wiki: ug
+    license: CC-BY-SA-4.0
+    url: https://ug.wikipedia.org
+- connector: glot500
+  params:
+    glot: uig_Arab
+    license: mixed
+- connector: culturax
+  params:
+    lang: ug
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: ug
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: ug
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: ug
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: uig_Arab
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

@@ -6,7 +6,7 @@ Take a language from *"here is an ISO code"* to *"here is a fine-tuned, evaluate
 
 Built for the messy reality of LRLs — Kurmanji/Sorani Kurdish, Welsh, Cornish, Farsi, and beyond — where corpora are scattered, scripts and dialects vary, and instruction data barely exists.
 
-> **Status:** Alpha (M4). **The full pipeline runs end-to-end today** — ingest → clean → tokenizer → pretrain → convdata → finetune → evaluate → export — verified on live data (Welsh, SmolLM2, Ollama teacher). The web dashboard (M5) is next. See [the roadmap](#roadmap).
+> **Status:** Alpha (M5). **The full pipeline runs end-to-end** — ingest → clean → tokenizer → pretrain → convdata → finetune → evaluate → export — plus a **Streamlit dashboard**, **33 built-in languages**, and **19 base models**. Verified on live data (Welsh, SmolLM2, Ollama/NLLB). See [the roadmap](#roadmap).
 
 ---
 
@@ -120,6 +120,17 @@ lrl clean    -c projects/welsh.yaml
 lrl pretrain -c projects/welsh.yaml
 ```
 
+### Built-in languages & models
+
+Run `lrl languages` to list what ships. Currently **33 languages** across Celtic
+(Welsh, Irish, Scottish Gaelic, Breton, Cornish…), African (Swahili, Yoruba,
+Hausa, Amharic, Zulu…), Asian (Uyghur, Tibetan, Pashto, Nepali, Khmer…), Kurdish
+(Kurmanji, Sorani), and more — each with script/dialect metadata, NLLB codes, and
+a source catalog. And **19 base models**: Qwen2.5 (0.5B–7B), Llama 3.1/3.2,
+Gemma 2, Mistral, Phi-3.5, **Aya-23 / Aya-Expanse** and **BLOOMZ** (multilingual,
+strong for LRLs), SmolLM2, TinyLlama, and XLM-R. Add your own by dropping a YAML
+in `configs/languages/` or `configs/models/` (or a dir on `$LRL_CONFIG_PATH`).
+
 ## Roadmap
 
 - **M0 — Scaffolding** ✅: package, config schemas, manifest, CLI, registry, governance docs.
@@ -127,8 +138,8 @@ lrl pretrain -c projects/welsh.yaml
 - **M2 — Model path** ✅: tokenizer extension (fertility-reported) + LoRA/QLoRA continued pretraining, with automatic QLoRA→LoRA fallback when there's no GPU.
 - **M3 — Conversational + SFT** ✅: translate (NLLB/M2M-100/OPUS-MT/MADLAD/teacher) + synth (Ollama/local) + review queue + SFT via TRL.
 - **M4 — Evaluate + export** ✅: held-out perplexity report card, LoRA merge, Ollama Modelfile, HF model card (best-effort GGUF via llama.cpp).
-- **M5 — Dashboard** *(next)*: wizard, run monitor, review queue, chat.
-- **M6 — Launch**: docs, tutorials for the seed languages, CI, first release.
+- **M5 — Dashboard** ✅: Streamlit app — wizard (generate a project), run monitor (run stages, view cards), review queue, chat with the trained model.
+- **M6 — Launch** *(next)*: docs, tutorials, CI, first release. Broader eval benchmarks (FLORES chrF, Belebele).
 
 ## Contributing
 

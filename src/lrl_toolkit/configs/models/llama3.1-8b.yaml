@@ -1,0 +1,7 @@
+hf_id: meta-llama/Llama-3.1-8B
+family: llama
+arch: decoder
+tokenizer_type: bpe
+context_length: 131072
+good_for_lrl: true
+notes: Capable 8B base; gated. QLoRA fits on a 24GB consumer GPU. Higher quality ceiling.

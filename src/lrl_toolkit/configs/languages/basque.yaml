@@ -1,0 +1,51 @@
+display_name: Basque
+iso639_3: eus
+iso639_1: eu
+nllb_code: eus_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: eu
+    license: CC-BY-SA-4.0
+    url: https://eu.wikipedia.org
+- connector: glot500
+  params:
+    glot: eus_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: eu
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: eu
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: eu
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: eu
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: eus_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

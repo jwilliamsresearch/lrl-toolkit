@@ -1,0 +1,9 @@
+hf_id: CohereForAI/aya-23-8B
+family: aya
+arch: decoder
+tokenizer_type: bpe
+context_length: 8192
+good_for_lrl: true
+notes: >
+  Cohere Aya-23 (8B) is explicitly multilingual (23 languages) and a strong LRL
+  starting point where a target or related language is covered. Gated (CC-BY-NC).

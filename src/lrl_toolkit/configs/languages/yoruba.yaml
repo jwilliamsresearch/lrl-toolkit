@@ -1,0 +1,51 @@
+display_name: Yoruba
+iso639_3: yor
+iso639_1: yo
+nllb_code: yor_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: yo
+    license: CC-BY-SA-4.0
+    url: https://yo.wikipedia.org
+- connector: glot500
+  params:
+    glot: yor_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: yo
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: yo
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: yo
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: yo
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: yor_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

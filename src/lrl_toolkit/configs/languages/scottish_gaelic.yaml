@@ -1,0 +1,51 @@
+display_name: Scottish Gaelic
+iso639_3: gla
+iso639_1: gd
+nllb_code: gla_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: gd
+    license: CC-BY-SA-4.0
+    url: https://gd.wikipedia.org
+- connector: glot500
+  params:
+    glot: gla_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: gd
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: gd
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: gd
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: gd
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: gla_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

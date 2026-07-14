@@ -1,0 +1,51 @@
+display_name: Hausa
+iso639_3: hau
+iso639_1: ha
+nllb_code: hau_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: ha
+    license: CC-BY-SA-4.0
+    url: https://ha.wikipedia.org
+- connector: glot500
+  params:
+    glot: hau_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: ha
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: ha
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: ha
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: ha
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: hau_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

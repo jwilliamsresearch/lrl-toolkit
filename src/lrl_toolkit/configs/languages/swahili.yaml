@@ -1,0 +1,51 @@
+display_name: Swahili
+iso639_3: swa
+iso639_1: sw
+nllb_code: swh_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: sw
+    license: CC-BY-SA-4.0
+    url: https://sw.wikipedia.org
+- connector: glot500
+  params:
+    glot: swh_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: sw
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: sw
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: sw
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: sw
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: swh_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

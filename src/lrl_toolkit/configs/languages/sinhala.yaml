@@ -1,0 +1,51 @@
+display_name: Sinhala
+iso639_3: sin
+iso639_1: si
+nllb_code: sin_Sinh
+scripts:
+- Sinhala
+default_script: Sinhala
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: si
+    license: CC-BY-SA-4.0
+    url: https://si.wikipedia.org
+- connector: glot500
+  params:
+    glot: sin_Sinh
+    license: mixed
+- connector: culturax
+  params:
+    lang: si
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: si
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: si
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: si
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: sin_Sinh
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

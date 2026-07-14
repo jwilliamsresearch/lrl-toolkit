@@ -1,0 +1,7 @@
+hf_id: HuggingFaceTB/SmolLM2-360M
+family: smollm
+arch: decoder
+tokenizer_type: bpe
+context_length: 8192
+good_for_lrl: false
+notes: Small English-centric base; handy for fast experiments and low VRAM. Apache-2.0.

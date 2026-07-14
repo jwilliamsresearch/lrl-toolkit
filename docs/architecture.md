@@ -49,7 +49,9 @@ inputs that determine its output. The orchestrator:
 
 Implemented and verified on live data: **ingest** (10 connectors) + **clean**
 (M1); **tokenizer** extension + **pretrain** LoRA/QLoRA (M2); **convdata**
-(translate + synth via local/Ollama teacher + review) + **finetune** SFT via TRL
-(M3); **evaluate** (perplexity) + **export** (LoRA merge, Ollama Modelfile, model
-card, best-effort GGUF) (M4). The license gate in `export` is enforced. Remaining:
-the **dashboard** (M5) and broader benchmarks (FLORES chrF, Belebele, judge).
+(translate via NLLB/M2M-100/OPUS-MT/MADLAD/teacher + synth via local/Ollama +
+review) + **finetune** SFT via TRL (M3); **evaluate** (perplexity) + **export**
+(LoRA merge, Ollama Modelfile, model card, best-effort GGUF) (M4); the Streamlit
+**dashboard** (M5, `dashboard/app.py`). 33 languages + 19 base models ship as
+config. The license gate in `export` is enforced. Remaining (M6): broader eval
+benchmarks (FLORES chrF, Belebele, judge), docs, CI, release.

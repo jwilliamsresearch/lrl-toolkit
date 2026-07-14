@@ -1,0 +1,51 @@
+display_name: Occitan
+iso639_3: oci
+iso639_1: oc
+nllb_code: oci_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: oc
+    license: CC-BY-SA-4.0
+    url: https://oc.wikipedia.org
+- connector: glot500
+  params:
+    glot: oci_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: oc
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: oc
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: oc
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: oc
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: oci_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

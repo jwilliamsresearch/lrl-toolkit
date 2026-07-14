@@ -1,0 +1,9 @@
+hf_id: bigscience/bloomz-1b7
+family: bloom
+arch: decoder
+tokenizer_type: bpe
+context_length: 2048
+good_for_lrl: true
+notes: >
+  BLOOMZ (1.7B) from BigScience covers 46+ languages incl. many under-resourced
+  African and Indic ones. Apache/RAIL-style license; good multilingual coverage.

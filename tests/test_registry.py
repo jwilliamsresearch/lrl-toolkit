@@ -18,6 +18,18 @@ def test_seed_languages_present():
     assert SEED_LANGUAGES.issubset(set(list_languages()))
 
 
+def test_all_bundled_languages_validate():
+    slugs = list_languages()
+    assert len(slugs) >= 30  # seeds + the expanded set
+    for slug in slugs:
+        prof = load_language(slug)
+        assert prof.iso639_3 and prof.scripts
+        assert prof.resolved_script() in prof.scripts
+        # If an NLLB code is set it must be script-tagged (e.g. cym_Latn).
+        if prof.nllb_code:
+            assert "_" in prof.nllb_code
+
+
 @pytest.mark.parametrize("slug", sorted(SEED_LANGUAGES))
 def test_language_profiles_validate(slug):
     prof = load_language(slug)

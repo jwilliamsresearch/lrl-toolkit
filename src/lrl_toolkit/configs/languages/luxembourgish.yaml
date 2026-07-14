@@ -1,0 +1,51 @@
+display_name: Luxembourgish
+iso639_3: ltz
+iso639_1: lb
+nllb_code: ltz_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: lb
+    license: CC-BY-SA-4.0
+    url: https://lb.wikipedia.org
+- connector: glot500
+  params:
+    glot: ltz_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: lb
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: lb
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: lb
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: lb
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: ltz_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

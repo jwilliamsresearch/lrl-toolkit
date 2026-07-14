@@ -1,0 +1,7 @@
+hf_id: HuggingFaceTB/SmolLM2-1.7B
+family: smollm
+arch: decoder
+tokenizer_type: bpe
+context_length: 8192
+good_for_lrl: false
+notes: Largest SmolLM2; English-centric but a fast, permissive (Apache-2.0) base.

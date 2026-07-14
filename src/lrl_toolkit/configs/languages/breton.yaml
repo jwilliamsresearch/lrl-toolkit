@@ -1,0 +1,47 @@
+display_name: Breton
+iso639_3: bre
+iso639_1: br
+nllb_code: null
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: br
+    license: CC-BY-SA-4.0
+    url: https://br.wikipedia.org
+- connector: glot500
+  params:
+    glot: bre_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: br
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: br
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: br
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: br
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+notes: 'Breton is not in NLLB-200; use translate_backend: teacher for MT.'

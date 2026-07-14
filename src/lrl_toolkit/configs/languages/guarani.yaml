@@ -1,0 +1,51 @@
+display_name: Guarani
+iso639_3: grn
+iso639_1: gn
+nllb_code: grn_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: gn
+    license: CC-BY-SA-4.0
+    url: https://gn.wikipedia.org
+- connector: glot500
+  params:
+    glot: grn_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: gn
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: gn
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: gn
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: gn
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: grn_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

@@ -1,0 +1,51 @@
+display_name: Faroese
+iso639_3: fao
+iso639_1: fo
+nllb_code: fao_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: fo
+    license: CC-BY-SA-4.0
+    url: https://fo.wikipedia.org
+- connector: glot500
+  params:
+    glot: fao_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: fo
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: fo
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: fo
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: fo
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: fao_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

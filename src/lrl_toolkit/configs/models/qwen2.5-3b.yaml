@@ -1,0 +1,7 @@
+hf_id: Qwen/Qwen2.5-3B
+family: qwen
+arch: decoder
+tokenizer_type: bpe
+context_length: 32768
+good_for_lrl: true
+notes: Mid-size Qwen2.5; strong multilingual base, QLoRA-friendly on a consumer GPU.

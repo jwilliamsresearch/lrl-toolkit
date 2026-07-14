@@ -1,0 +1,51 @@
+display_name: Nepali
+iso639_3: nep
+iso639_1: ne
+nllb_code: npi_Deva
+scripts:
+- Devanagari
+default_script: Devanagari
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: ne
+    license: CC-BY-SA-4.0
+    url: https://ne.wikipedia.org
+- connector: glot500
+  params:
+    glot: nep_Deva
+    license: mixed
+- connector: culturax
+  params:
+    lang: ne
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: ne
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: ne
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: ne
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: npi_Deva
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

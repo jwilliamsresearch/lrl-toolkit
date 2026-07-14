@@ -1,0 +1,51 @@
+display_name: Igbo
+iso639_3: ibo
+iso639_1: ig
+nllb_code: ibo_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: ig
+    license: CC-BY-SA-4.0
+    url: https://ig.wikipedia.org
+- connector: glot500
+  params:
+    glot: ibo_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: ig
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: ig
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: ig
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: ig
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: ibo_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

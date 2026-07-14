@@ -1,0 +1,51 @@
+display_name: Irish
+iso639_3: gle
+iso639_1: ga
+nllb_code: gle_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: ga
+    license: CC-BY-SA-4.0
+    url: https://ga.wikipedia.org
+- connector: glot500
+  params:
+    glot: gle_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: ga
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: ga
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: ga
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: ga
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: gle_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

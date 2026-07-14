@@ -1,0 +1,52 @@
+display_name: Pashto
+iso639_3: pus
+iso639_1: ps
+nllb_code: pbt_Arab
+scripts:
+- Arabic
+default_script: Arabic
+direction: rtl
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: true
+  rules:
+  - arabic_presentation_forms
+sources:
+- connector: wikipedia
+  params:
+    wiki: ps
+    license: CC-BY-SA-4.0
+    url: https://ps.wikipedia.org
+- connector: glot500
+  params:
+    glot: pus_Arab
+    license: mixed
+- connector: culturax
+  params:
+    lang: ps
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: ps
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: ps
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: ps
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: pbt_Arab
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

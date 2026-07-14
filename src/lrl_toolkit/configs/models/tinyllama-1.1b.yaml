@@ -1,0 +1,7 @@
+hf_id: TinyLlama/TinyLlama_v1.1
+family: llama
+arch: decoder
+tokenizer_type: bpe
+context_length: 2048
+good_for_lrl: false
+notes: Tiny 1.1B Llama-architecture base; permissive (Apache-2.0), good for cheap runs.

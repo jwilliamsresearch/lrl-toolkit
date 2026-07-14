@@ -1,0 +1,7 @@
+hf_id: meta-llama/Llama-3.2-1B
+family: llama
+arch: decoder
+tokenizer_type: bpe
+context_length: 131072
+good_for_lrl: true
+notes: Small Llama 3.2; gated on the Hub. Tokenizer extension helps for non-Latin scripts.

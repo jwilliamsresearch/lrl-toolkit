@@ -1,0 +1,10 @@
+hf_id: microsoft/Phi-3.5-mini-instruct
+family: phi
+arch: decoder
+tokenizer_type: bpe
+context_length: 131072
+good_for_lrl: false
+notes: >
+  3.8B, strong for its size but English-centric; useful when the target language
+  has some Latin-script overlap. Instruct variant (skip continued pretraining or
+  adapt carefully).

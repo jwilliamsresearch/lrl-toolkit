@@ -1,0 +1,51 @@
+display_name: Maltese
+iso639_3: mlt
+iso639_1: mt
+nllb_code: mlt_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: mt
+    license: CC-BY-SA-4.0
+    url: https://mt.wikipedia.org
+- connector: glot500
+  params:
+    glot: mlt_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: mt
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: mt
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: mt
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: mt
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: mlt_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

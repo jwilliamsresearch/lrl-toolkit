@@ -22,6 +22,7 @@ from . import __version__
 from .config import STAGE_ORDER, load_project
 from .pipeline import run_pipeline, run_single_stage
 from .registry import list_compute, list_languages, list_models, load_language
+from .scaffold import scaffold_yaml
 
 app = typer.Typer(
     add_completion=False,
@@ -72,7 +73,7 @@ def init(
         console.print(f"[red]Refusing to overwrite existing file:[/red] {out_path}")
         raise typer.Exit(code=1)
 
-    content = _scaffold_yaml(language, base_model, compute)
+    content = scaffold_yaml(language, language, base_model, compute)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(content, encoding="utf-8")
     console.print(f"[green]Created[/green] {out_path}")
@@ -163,55 +164,6 @@ def _print_outcomes(project_name: str, outcomes) -> None:
         color = "green" if o.status == "ran" else "yellow"
         table.add_row(o.stage, f"[{color}]{o.status}[/{color}]", o.fingerprint)
     console.print(table)
-
-
-def _scaffold_yaml(language: str, base_model: str, compute: str) -> str:
-    return f"""# lrl-toolkit project: {language}
-name: {language}
-language: {language}
-base_model: {base_model}
-compute: {compute}
-seed: 42
-
-ingest:
-  sources: []          # empty = use every source in the language profile
-  max_gb: 5
-
-clean:
-  lang_id: glotlid
-  dedup: minhash
-  min_quality: 0.6
-
-tokenizer:
-  strategy: extend
-  added_tokens: 8000
-
-pretrain:
-  method: qlora
-  epochs: 1
-  seq_len: 2048
-
-convdata:
-  translate: [dolly]         # instruction sets: dolly/alpaca/oasst1 or a local path
-  translate_limit: 500
-  translate_backend: nllb    # MT backend: nllb/m2m100/opusmt/madlad/teacher/mock
-  provider: ollama           # local teacher for synth (ollama/local/mock); no proprietary APIs
-  synth:
-    provider: ollama
-    n: 2000
-  review: true
-
-finetune:
-  method: qlora
-  dpo: false
-
-evaluate:
-  benchmarks: [perplexity, flores, belebele]
-
-export:
-  quantize: [gguf_q4_k_m]
-  push_to_hub: false
-"""
 
 
 if __name__ == "__main__":  # pragma: no cover

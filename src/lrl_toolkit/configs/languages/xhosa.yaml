@@ -1,0 +1,51 @@
+display_name: Xhosa
+iso639_3: xho
+iso639_1: xh
+nllb_code: xho_Latn
+scripts:
+- Latin
+default_script: Latin
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: xh
+    license: CC-BY-SA-4.0
+    url: https://xh.wikipedia.org
+- connector: glot500
+  params:
+    glot: xho_Latn
+    license: mixed
+- connector: culturax
+  params:
+    lang: xh
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: xh
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: xh
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: xh
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: xho_Latn
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.

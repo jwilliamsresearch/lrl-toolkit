@@ -1,0 +1,7 @@
+hf_id: Qwen/Qwen2.5-0.5B
+family: qwen
+arch: decoder
+tokenizer_type: bpe
+context_length: 32768
+good_for_lrl: true
+notes: Smallest Qwen2.5; fits tight VRAM / CPU experiments. Large multilingual tokenizer.

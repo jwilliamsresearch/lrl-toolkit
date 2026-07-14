@@ -1,0 +1,51 @@
+display_name: Amharic
+iso639_3: amh
+iso639_1: am
+nllb_code: amh_Ethi
+scripts:
+- Ethiopic
+default_script: Ethiopic
+direction: ltr
+dialects: []
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+- connector: wikipedia
+  params:
+    wiki: am
+    license: CC-BY-SA-4.0
+    url: https://am.wikipedia.org
+- connector: glot500
+  params:
+    glot: amh_Ethi
+    license: mixed
+- connector: culturax
+  params:
+    lang: am
+    license: ODC-BY-1.0
+- connector: madlad400
+  params:
+    lang: am
+    variant: clean
+    license: ODC-BY-1.0
+- connector: oscar
+  params:
+    lang: am
+    license: CC0-1.0
+  notes: OSCAR-2301 — GATED; set HF_TOKEN.
+- connector: opus
+  params:
+    src: am
+    tgt: en
+    corpora:
+    - OpenSubtitles
+    - Tatoeba
+    - NLLB
+    license: mixed
+- connector: flores
+  params:
+    flores: amh_Ethi
+    license: CC-BY-SA-4.0
+  notes: GATED; set HF_TOKEN.
