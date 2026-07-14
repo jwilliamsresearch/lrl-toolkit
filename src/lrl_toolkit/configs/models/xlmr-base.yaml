@@ -1,0 +1,10 @@
+hf_id: FacebookAI/xlm-roberta-base
+family: xlmr
+arch: encoder
+tokenizer_type: sentencepiece
+context_length: 512
+good_for_lrl: true
+notes: >
+  Encoder (masked LM) covering 100 languages — for classification/embedding-style
+  LRL tasks rather than chat. The convdata/finetune chat path does not apply to
+  encoders; use for the continued-pretraining + downstream-eval path.

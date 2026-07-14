@@ -1,0 +1,26 @@
+display_name: Persian (Farsi)
+iso639_3: fas
+iso639_1: fa
+scripts: [Arabic]
+default_script: Arabic
+direction: rtl
+family: Iranian (Southwestern)
+dialects: [Iranian Persian]
+normalization:
+  unicode_form: NFC
+  normalize_digits: true
+  rules: [arabic_presentation_forms, persian_yeh_kaf]  # ي->ی, ك->ک, ZWNJ handling
+sources:
+  - connector: wikipedia
+    params: {wiki: fa, license: CC-BY-SA-4.0, url: "https://fa.wikipedia.org"}
+    notes: Persian Wikipedia — large.
+  - connector: oscar
+    params: {lang: fa, license: CC0-1.0}
+  - connector: opus
+    params: {corpora: [OpenSubtitles, Tatoeba], src: fa, license: mixed}
+  - connector: leipzig
+    params: {lang: fas, license: CC-BY-NC-4.0}
+notes: >
+  Persian is mid-resource, not truly low-resource, but is a useful bridge/target
+  and shares Arabic-script normalization needs with Sorani. Correct ZWNJ (نیم‌فاصله)
+  handling matters for tokenization.

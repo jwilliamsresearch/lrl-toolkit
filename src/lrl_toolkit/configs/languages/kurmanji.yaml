@@ -1,0 +1,26 @@
+display_name: Kurmanji Kurdish
+iso639_3: kmr
+iso639_1: ku
+scripts: [Latin]
+default_script: Latin
+direction: ltr
+family: Iranian (Northwestern)
+dialects: [Northern Kurdish]
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: [kurdish_latin]   # normalize î/û/ê/ç/ş and common variant spellings
+sources:
+  - connector: wikipedia
+    params: {wiki: ku, license: CC-BY-SA-4.0, url: "https://ku.wikipedia.org"}
+    notes: Kurdish (Kurmanji, Latin script) Wikipedia.
+  - connector: oscar
+    params: {lang: ku, license: CC0-1.0}
+    notes: Web text.
+  - connector: opus
+    params: {corpora: [OpenSubtitles, Tatoeba], src: ku, license: mixed}
+  - connector: leipzig
+    params: {lang: kmr, license: CC-BY-NC-4.0}
+notes: >
+  Kurmanji is written in Latin script; Sorani (ckb) is a separate profile in
+  Arabic script. Keep the two apart — script/dialect is a first-class axis here.

@@ -1,0 +1,9 @@
+hf_id: google/gemma-2-2b
+family: gemma
+arch: decoder
+tokenizer_type: sentencepiece
+context_length: 8192
+good_for_lrl: true
+notes: >
+  Compact base with a large 256k SentencePiece vocab (good multilingual coverage
+  out of the box). Gated on the Hub.

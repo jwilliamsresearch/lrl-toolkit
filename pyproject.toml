@@ -1,0 +1,109 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lrl-toolkit"
+version = "0.1.0"
+description = "An open-source, config-driven pipeline for building custom language models for low-resource languages."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "lrl-toolkit contributors" }]
+keywords = [
+    "nlp", "low-resource-languages", "llm", "fine-tuning", "qlora",
+    "multilingual", "kurdish", "welsh", "cornish", "farsi",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Core dependencies: enough to load configs, run the CLI, and orchestrate.
+# Heavy ML/data deps live in optional extras so the base install stays light.
+dependencies = [
+    "pydantic>=2.6",
+    "pyyaml>=6.0",
+    "typer>=0.12",
+    "rich>=13.7",
+    "platformdirs>=4.0",
+]
+
+[project.optional-dependencies]
+# Data ingestion + cleaning stack.
+data = [
+    "datasets>=2.18",
+    "trafilatura>=1.8",
+    "jusText>=3.0",
+    "pymupdf>=1.24",
+    "mwparserfromhell>=0.6",
+    "datasketch>=1.6",
+    "fasttext-wheel>=0.9.2",
+]
+# Training / model adaptation stack.
+train = [
+    "torch>=2.2",
+    "transformers>=4.44",
+    "datasets>=2.18",
+    "tokenizers>=0.19",
+    "sentencepiece>=0.2",
+    "peft>=0.11",
+    "trl>=0.9",
+    "accelerate>=0.30",
+    "bitsandbytes>=0.43; platform_system != 'Darwin'",
+]
+# Evaluation stack.
+eval = [
+    "sacrebleu>=2.4",
+    "lm-eval>=0.4",
+]
+# Local web dashboard.
+dashboard = [
+    "streamlit>=1.36",
+]
+# Teacher-LLM providers for synthetic conversational data.
+llm = [
+    "anthropic>=0.34",
+    "openai>=1.40",
+]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.5",
+    "mypy>=1.10",
+]
+# Convenience: everything.
+all = [
+    "lrl-toolkit[data,train,eval,dashboard,llm,dev]",
+]
+
+[project.scripts]
+lrl = "lrl_toolkit.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/lrl-toolkit/lrl-toolkit"
+Documentation = "https://github.com/lrl-toolkit/lrl-toolkit/tree/main/docs"
+Issues = "https://github.com/lrl-toolkit/lrl-toolkit/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lrl_toolkit"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# Typer's public API requires calling typer.Option/Argument in argument
+# defaults; B008 flags that pattern as a false positive here.
+"src/lrl_toolkit/cli.py" = ["B008"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

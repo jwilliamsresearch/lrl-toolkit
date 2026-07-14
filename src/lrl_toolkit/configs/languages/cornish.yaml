@@ -1,0 +1,27 @@
+display_name: Cornish
+iso639_3: cor
+iso639_1: kw
+scripts: [Latin]
+default_script: Latin
+direction: ltr
+family: Celtic (Brythonic)
+dialects: [Standard Written Form]
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: []
+sources:
+  - connector: wikipedia
+    params: {wiki: kw, license: CC-BY-SA-4.0, url: "https://kw.wikipedia.org"}
+    notes: Cornish Wikipedia — small; expect a very low-resource run.
+  - connector: opus
+    params: {corpora: [Tatoeba, bible-uedin], src: kw, license: mixed}
+  - connector: local
+    params: {path: null, license: unknown}
+    notes: >
+      Cornish is revived and extremely low-resource; community-contributed local
+      texts (with permission) matter a lot. Point `path` at a directory.
+notes: >
+  A genuinely tiny-corpus case. Use aggressive tokenizer extension and lean on
+  translated + synthetic conversational data. Involve the Cornish language
+  community (CARE principles) before training on community texts.

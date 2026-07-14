@@ -1,0 +1,28 @@
+display_name: Welsh
+iso639_3: cym
+iso639_1: cy
+scripts: [Latin]
+default_script: Latin
+direction: ltr
+family: Celtic (Brythonic)
+dialects: [Northern, Southern]
+normalization:
+  unicode_form: NFC
+  normalize_digits: false
+  rules: [welsh_digraphs]   # treat ch, dd, ff, ng, ll, ph, rh, th as units where relevant
+sources:
+  - connector: wikipedia
+    params: {wiki: cy, license: CC-BY-SA-4.0, url: "https://cy.wikipedia.org"}
+    notes: Welsh Wikipedia — sizeable and high quality for an LRL.
+  - connector: oscar
+    params: {lang: cy, license: CC0-1.0}
+    notes: Web text (CommonCrawl-derived).
+  - connector: opus
+    params: {corpora: [OpenSubtitles, Tatoeba, bible-uedin], src: cy, license: mixed}
+    notes: Parallel + monolingual; good for MT and dialogue seeds.
+  - connector: leipzig
+    params: {lang: cym, license: CC-BY-NC-4.0}
+    notes: Leipzig Corpora news/web packages.
+notes: >
+  Welsh is comparatively well-resourced among LRLs, which makes it the reference
+  language for the smoke pipeline and tutorials.

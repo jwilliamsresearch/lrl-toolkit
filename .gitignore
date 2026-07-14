@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.env
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# lrl-toolkit working data (large / generated artifacts)
+projects/*/artifacts/
+projects/*/data/
+projects/*/models/
+projects/*/.lrl/
+*.gguf
+*.safetensors
+wandb/
+
+# OS
+.DS_Store
+Thumbs.db
+plan.md

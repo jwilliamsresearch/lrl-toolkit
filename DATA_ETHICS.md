@@ -1,0 +1,32 @@
+# Data Ethics & Governance
+
+Low-resource languages frequently belong to minority, indigenous, or endangered-language communities. The data used to build a model *is* someone's cultural heritage. `lrl-toolkit` treats ethics and provenance as **first-class, enforced parts of the pipeline** — not documentation you're trusted to read.
+
+## Principles
+
+We build on two complementary frameworks:
+
+- **FAIR** — data should be Findable, Accessible, Interoperable, and Reusable.
+- **CARE Principles for Indigenous Data Governance** — Collective benefit, Authority to control, Responsibility, and Ethics. Where FAIR is about the data, CARE is about the *people*. For minority and indigenous languages, CARE takes precedence when the two are in tension.
+
+## What the toolkit enforces
+
+1. **Provenance tracking at ingest.** Every source produces a `ProvenanceRecord` (source name, URL, retrieval date, license, and any attribution requirements). Nothing enters a corpus untracked.
+2. **License resolution gate.** A project **cannot reach the `export` stage** until every source in its corpus has a resolved, recorded license. Unknown-license data blocks export by default.
+3. **Robots & opt-out respect.** The web-crawl connector honors `robots.txt` and a configurable per-project source **blocklist**. Do not use it to circumvent site terms.
+4. **Data & model cards.** The `clean` stage emits a **data card** (source mix, token counts, filter drop rates); `export` emits a **model card** (provenance, evals, license, intended use, and limitations). Both ship with every model.
+
+## What we ask of you
+
+- **Involve the language community.** Automated translation and synthetic data are a starting point, not an endpoint. The human-in-the-loop **review tooling exists so native speakers can accept, correct, or reject** generated data before it trains a model. Use it.
+- **Seek consent for community-held data.** If a corpus was created by or for a specific community (oral histories, sacred texts, community forums), obtain permission before training on it — even when it is technically downloadable.
+- **Attribute.** Preserve and surface the attribution requirements the toolkit records for you.
+- **Represent limitations honestly.** LRL models trained on thin, machine-translated, or non-representative data can be confidently wrong in ways that matter. Say so in the model card.
+
+## What we won't help with
+
+The toolkit is for building genuinely useful language technology *with and for* language communities. It is not for scraping around site terms, laundering unlicensed data, or producing models misrepresented as community-endorsed.
+
+---
+
+*This document is a living commitment. If you work with a language community and see something we should do differently, please open an issue — see [GOVERNANCE.md](GOVERNANCE.md).*

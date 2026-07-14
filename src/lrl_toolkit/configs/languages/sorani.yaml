@@ -1,0 +1,23 @@
+display_name: Sorani Kurdish
+iso639_3: ckb
+iso639_1: null
+scripts: [Arabic]
+default_script: Arabic
+direction: rtl
+family: Iranian (Northwestern)
+dialects: [Central Kurdish]
+normalization:
+  unicode_form: NFC
+  normalize_digits: true
+  rules: [arabic_presentation_forms, sorani_arabic]  # normalize ک/ك, ی/ي, ه/ە etc.
+sources:
+  - connector: wikipedia
+    params: {wiki: ckb, license: CC-BY-SA-4.0, url: "https://ckb.wikipedia.org"}
+    notes: Central Kurdish (Sorani, Arabic script) Wikipedia.
+  - connector: oscar
+    params: {lang: ckb, license: CC0-1.0}
+  - connector: leipzig
+    params: {lang: ckb, license: CC-BY-NC-4.0}
+notes: >
+  Right-to-left Arabic script with Kurdish-specific letters. Character
+  normalization (ک vs ك, ی vs ي, ە) is essential — see the sorani_arabic rules.

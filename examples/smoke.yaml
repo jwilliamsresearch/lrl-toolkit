@@ -1,0 +1,47 @@
+# Smoke pipeline — the end-to-end acceptance test.
+#
+# Adapts a tiny model on a tiny slice of Welsh so `lrl run -c examples/smoke.yaml`
+# completes in minutes on CPU/small GPU (and in CI). It exercises every stage and
+# the manifest skip/resume logic; it is not meant to produce a good model.
+name: smoke
+language: welsh
+base_model: smollm2-135m
+compute: consumer_gpu
+seed: 42
+
+ingest:
+  sources: [wikipedia]     # single small source
+  max_gb: 0.01
+  max_docs_per_source: 500
+
+clean:
+  lang_id: glotlid
+  dedup: exact
+  min_quality: 0.3
+
+tokenizer:
+  strategy: extend
+  added_tokens: 1000
+
+pretrain:
+  method: qlora
+  max_steps: 20
+  seq_len: 512
+
+convdata:
+  translate: [dolly]
+  synth:
+    provider: local
+    n: 50
+  review: false            # no human review in the automated smoke run
+
+finetune:
+  method: qlora
+  epochs: 1
+
+evaluate:
+  benchmarks: [perplexity]
+
+export:
+  quantize: [gguf_q4_k_m]
+  push_to_hub: false

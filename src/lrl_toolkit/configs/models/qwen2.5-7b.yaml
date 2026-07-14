@@ -1,0 +1,7 @@
+hf_id: Qwen/Qwen2.5-7B
+family: qwen
+arch: decoder
+tokenizer_type: bpe
+context_length: 32768
+good_for_lrl: true
+notes: Larger Qwen base; QLoRA fits on a 24GB consumer GPU. Better quality ceiling.

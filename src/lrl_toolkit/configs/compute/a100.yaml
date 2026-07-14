@@ -1,0 +1,12 @@
+device: cuda
+precision: bf16
+quantization: none
+per_device_batch_size: 8
+gradient_accumulation_steps: 4
+gradient_checkpointing: true
+use_unsloth: false
+distributed: none
+max_seq_len_cap: 4096
+notes: >
+  Single 40-80GB A100/H100. Allows full-parameter fine-tuning of small models or
+  larger LoRA ranks; no quantization needed.
