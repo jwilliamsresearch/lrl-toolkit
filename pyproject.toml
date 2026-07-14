@@ -70,11 +70,10 @@ eval = [
 dashboard = [
     "streamlit>=1.36",
 ]
-# Teacher-LLM providers for synthetic conversational data.
-llm = [
-    "anthropic>=0.34",
-    "openai>=1.40",
-]
+# Teacher-LLM for synthetic conversational data. Only local/open teachers are
+# supported (proprietary APIs prohibit training on their outputs): the 'ollama'
+# provider talks to a local Ollama server over HTTP (needs `requests`, already in
+# [data]); the 'local' provider uses a transformers model (in [train]).
 dev = [
     "pytest>=8.0",
     "ruff>=0.5",
@@ -82,7 +81,7 @@ dev = [
 ]
 # Convenience: everything.
 all = [
-    "lrl-toolkit[data,train,eval,dashboard,llm,dev]",
+    "lrl-toolkit[data,train,eval,dashboard,dev]",
 ]
 
 [project.scripts]

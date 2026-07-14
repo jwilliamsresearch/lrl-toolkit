@@ -29,9 +29,10 @@ pretrain:
   seq_len: 512
 
 convdata:
-  translate: [dolly]
+  translate: []
+  provider: mock           # deterministic offline teacher for the smoke run
   synth:
-    provider: local
+    provider: mock
     n: 50
   review: false            # no human review in the automated smoke run
 

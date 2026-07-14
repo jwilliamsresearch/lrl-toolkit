@@ -47,7 +47,9 @@ inputs that determine its output. The orchestrator:
 
 ## Where each milestone lands
 
-The stage modules currently ship as functional M0 scaffolding (they produce
-real cards/artifacts and exercise the manifest). The heavy logic arrives per the
-roadmap in `README.md`: data connectors + filters (M1), tokenizer + pretraining
-(M2), conversational data + SFT (M3), evaluation + export (M4), dashboard (M5).
+Implemented and verified on live data: **ingest** (10 connectors) + **clean**
+(M1); **tokenizer** extension + **pretrain** LoRA/QLoRA (M2); **convdata**
+(translate + synth via local/Ollama teacher + review) + **finetune** SFT via TRL
+(M3); **evaluate** (perplexity) + **export** (LoRA merge, Ollama Modelfile, model
+card, best-effort GGUF) (M4). The license gate in `export` is enforced. Remaining:
+the **dashboard** (M5) and broader benchmarks (FLORES chrF, Belebele, judge).

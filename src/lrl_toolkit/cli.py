@@ -192,10 +192,12 @@ pretrain:
   seq_len: 2048
 
 convdata:
-  translate: [dolly, oasst1]
+  translate: [dolly]
+  translate_limit: 500
+  provider: ollama          # local teacher LLM (ollama/local/mock); no proprietary APIs
   synth:
-    provider: claude
-    n: 5000
+    provider: ollama
+    n: 2000
   review: true
 
 finetune:

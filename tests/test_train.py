@@ -25,6 +25,14 @@ def _project(tmp_path, tiny_model, **overrides):
         "clean": {"lang_id": "none", "dedup": "exact", "min_quality": 0.3},
         "tokenizer": {"strategy": "extend", "added_tokens": 50},
         "pretrain": {"method": "qlora", "max_steps": 2, "seq_len": 32},
+        "convdata": {
+            "provider": "mock",
+            "translate": [],
+            "synth": {"provider": "mock", "n": 8},
+            "review": False,
+        },
+        "finetune": {"method": "qlora", "max_steps": 2, "max_seq_len": 64},
+        "evaluate": {"benchmarks": ["perplexity"]},
     }
     data.update(overrides)
     p = tmp_path / "m2.yaml"
@@ -60,11 +68,48 @@ def test_pretrain_falls_back_to_lora_on_cpu_and_trains(tmp_path, tiny_model):
     assert (proj.stage_dir("pretrain") / "adapter").is_dir()
 
 
+def test_sft_finetune_trains_on_mock_pairs(tmp_path, tiny_model):
+    proj = _project(tmp_path, tiny_model)
+    run_pipeline(proj, stages=["ingest", "clean", "tokenizer", "pretrain", "convdata"])
+    outcome = run_single_stage(proj, "finetune")
+    assert outcome.status == "ran"
+    card = read_json(proj.stage_dir("finetune") / "finetune_card.json")
+    assert card["method_used"] == "lora"  # QLoRA -> LoRA on CPU
+    assert card["steps"] == 2
+    assert card["n_examples"] == 8
+    assert (proj.stage_dir("finetune") / "adapter").is_dir()
+
+
+def test_evaluate_computes_perplexity(tmp_path, tiny_model):
+    proj = _project(tmp_path, tiny_model)
+    run_pipeline(proj, stages=["ingest", "clean", "tokenizer", "pretrain"])
+    run_single_stage(proj, "evaluate")
+    report = read_json(proj.stage_dir("evaluate") / "report_card.json")
+    ppl = report["results"]["perplexity"]
+    assert isinstance(ppl["value"], float) and ppl["value"] > 0
+
+
+def test_export_merges_adapter_and_writes_card(tmp_path, tiny_model):
+    proj = _project(tmp_path, tiny_model)
+    run_pipeline(
+        proj, stages=["ingest", "clean", "tokenizer", "pretrain", "convdata", "finetune"]
+    )
+    run_single_stage(proj, "export")
+    assert (proj.stage_dir("export") / "merged").is_dir()
+    assert (proj.stage_dir("export") / "MODEL_CARD.md").is_file()
+    assert (proj.stage_dir("export") / "Modelfile").is_file()
+    export_card = read_json(proj.stage_dir("export") / "export_card.json")
+    # GGUF conversion is best-effort; without llama.cpp it is reported as skipped.
+    assert export_card["packaging"]["gguf"]["status"] in {"skipped", "available", "not_requested"}
+
+
 def test_full_eight_stage_pipeline_with_tiny_model(tmp_path, tiny_model):
     proj = _project(tmp_path, tiny_model)
     outcomes = run_pipeline(proj)
     assert [o.stage for o in outcomes] == list(proj.config.selected_stages())
     assert all(o.status == "ran" for o in outcomes)
-    # Real adapter from pretrain + auto-generated model card from export.
+    # Real adapters from pretrain + SFT, and a merged export.
     assert (proj.stage_dir("pretrain") / "adapter").is_dir()
+    assert (proj.stage_dir("finetune") / "adapter").is_dir()
+    assert (proj.stage_dir("export") / "merged").is_dir()
     assert (proj.stage_dir("export") / "MODEL_CARD.md").is_file()

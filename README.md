@@ -6,7 +6,7 @@ Take a language from *"here is an ISO code"* to *"here is a fine-tuned, evaluate
 
 Built for the messy reality of LRLs — Kurmanji/Sorani Kurdish, Welsh, Cornish, Farsi, and beyond — where corpora are scattered, scripts and dialects vary, and instruction data barely exists.
 
-> **Status:** Alpha (M2 — model path). The config system, registry, CLI, **ingest connectors, clean stage, tokenizer extension, and continued pretraining** work today against live data. Conversational-data + fine-tuning are next. See [the roadmap](#roadmap).
+> **Status:** Alpha (M4). **The full pipeline runs end-to-end today** — ingest → clean → tokenizer → pretrain → convdata → finetune → evaluate → export — verified on live data (Welsh, SmolLM2, Ollama teacher). The web dashboard (M5) is next. See [the roadmap](#roadmap).
 
 ---
 
@@ -64,6 +64,22 @@ Gated sources need a Hugging Face token: `export HF_TOKEN=hf_...` (or
 its license; **export is blocked until all licenses resolve** (see
 [DATA_ETHICS.md](DATA_ETHICS.md)).
 
+### Conversational data (teacher LLMs)
+
+The `convdata` stage builds instruction/chat pairs by translating open
+instruction sets and synthesizing native pairs with a **teacher LLM**. Only
+**local / open-weight teachers** are supported — proprietary hosted APIs (Claude,
+OpenAI, Gemini) prohibit using their outputs to train other models:
+
+| Provider | Backend | Notes |
+|----------|---------|-------|
+| `ollama` | local Ollama server | **Recommended.** Free, no key. `ollama pull qwen2.5:7b` |
+| `local` | transformers model | Runs an open HF model in-process |
+| `mock` | deterministic | Offline/CI; no model |
+
+Generated pairs pass through an optional **human review** queue (native speakers
+accept/edit/reject) before fine-tuning — see [DATA_ETHICS.md](DATA_ETHICS.md).
+
 ## Install
 
 ```bash
@@ -95,9 +111,9 @@ lrl pretrain -c projects/welsh.yaml
 - **M0 — Scaffolding** ✅: package, config schemas, manifest, CLI, registry, governance docs.
 - **M1 — Data path** ✅: 10 ingest connectors (Wikipedia, Glot500, CulturaX, MADLAD-400, OSCAR, Common Crawl, OPUS/NLLB, SMOL, FLORES, local) + full clean stage (normalize, language-ID, dedup, quality filters, PII).
 - **M2 — Model path** ✅: tokenizer extension (fertility-reported) + LoRA/QLoRA continued pretraining, with automatic QLoRA→LoRA fallback when there's no GPU.
-- **M3 — Conversational + SFT** *(next)*: translate + synth + review + SFT → a working Welsh chat model.
-- **M4 — Evaluate + export**: report card, GGUF/Ollama, HF model card.
-- **M5 — Dashboard**: wizard, run monitor, review queue, chat.
+- **M3 — Conversational + SFT** ✅: translate + synth (local/Ollama teacher) + review queue + SFT via TRL.
+- **M4 — Evaluate + export** ✅: held-out perplexity report card, LoRA merge, Ollama Modelfile, HF model card (best-effort GGUF via llama.cpp).
+- **M5 — Dashboard** *(next)*: wizard, run monitor, review queue, chat.
 - **M6 — Launch**: docs, tutorials for the seed languages, CI, first release.
 
 ## Contributing

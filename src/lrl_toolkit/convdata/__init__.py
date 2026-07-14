@@ -1,21 +1,36 @@
-"""Convdata stage: build conversational/instruction pairs.
+"""Convdata stage: build conversational/instruction pairs for fine-tuning.
 
-Three configurable generators, all emitting a unified ``messages`` schema:
-  * translate open instruction datasets into the target language,
-  * synthesize native pairs via a configurable teacher LLM (default Claude),
-  * route everything through human-in-the-loop review before training.
-
-M0 status: scaffolding — records the plan and expected counts. M3 implements the
-generators, the back-translation/chrF quality filter, and the review queue
-(surfaced in the dashboard).
+Combines three generators — translating open instruction datasets, synthesizing
+native pairs with a teacher LLM (grounded in the corpus), and a human review
+queue — into a single accepted set in the unified ``messages`` schema.
 """
 
 from __future__ import annotations
 
+from pathlib import Path
+
+from ..corpus import iter_documents
 from ..pipeline.base import Stage, StageContext, StageResult
 from ..utils import get_logger, write_json
+from . import review as review_mod
+from .instruction_sets import load_instruction_set
+from .schema import chat_pair, instruction_of, write_jsonl
+from .teacher import get_teacher
 
 log = get_logger("lrl.convdata")
+
+__all__ = ["ConvDataStage"]
+
+
+def _corpus_contexts(clean_dir: Path, k: int = 20) -> list[str]:
+    contexts: list[str] = []
+    if not clean_dir.exists():
+        return contexts
+    for doc in iter_documents(clean_dir):
+        contexts.append(doc.text)
+        if len(contexts) >= k:
+            break
+    return contexts
 
 
 class ConvDataStage(Stage):
@@ -23,26 +38,73 @@ class ConvDataStage(Stage):
 
     def run(self, ctx: StageContext) -> StageResult:
         cfg = ctx.project.config.convdata
+        lang_name = ctx.project.language_profile.display_name
         out_dir = ctx.stage_dir(self.name)
+        clean_dir = ctx.project.stage_dir("clean") / "corpus"
 
-        plan = {
+        pairs: list[dict] = []
+
+        # --- translate open instruction datasets ------------------------- #
+        if cfg.translate:
+            translator = get_teacher(cfg.provider, cfg.model)
+            for ds_name in cfg.translate:
+                count = 0
+                for ex in load_instruction_set(ds_name, limit=cfg.translate_limit):
+                    instr = translator.translate(ex["instruction"], lang_name)
+                    resp = translator.translate(ex["response"], lang_name)
+                    pairs.append(chat_pair(instr, resp, source=f"translate:{ds_name}"))
+                    count += 1
+                log.info("[convdata] translated %d from %s", count, ds_name)
+
+        # --- synthesize native pairs via a teacher LLM ------------------- #
+        if cfg.synth and cfg.synth.n > 0:
+            teacher = get_teacher(cfg.synth.provider, cfg.synth.model)
+            contexts = _corpus_contexts(clean_dir) if cfg.synth.ground_in_corpus else None
+            synth_pairs = teacher.generate_pairs(cfg.synth.n, lang_name, contexts)
+            for p in synth_pairs:
+                pairs.append(chat_pair(p["instruction"], p["response"], source="synth"))
+            log.info("[convdata] synthesized %d pairs", len(synth_pairs))
+
+        # --- dedup by instruction --------------------------------------- #
+        seen: set[str] = set()
+        deduped: list[dict] = []
+        for p in pairs:
+            key = instruction_of(p).strip().lower()
+            if key and key not in seen:
+                seen.add(key)
+                deduped.append(p)
+
+        # --- review queue ----------------------------------------------- #
+        queue = review_mod.build_queue(deduped)
+        queue_path = out_dir / "review_queue.jsonl"
+        queue = review_mod.merge_reviews(queue, queue_path)
+        review_mod.save_queue(queue, queue_path)
+
+        accepted = review_mod.accepted_pairs(queue, review_enabled=cfg.review)
+        write_jsonl(out_dir / "pairs.jsonl", deduped)
+        write_jsonl(out_dir / "accepted.jsonl", accepted)
+
+        card = {
+            "language": lang_name,
             "translate_datasets": cfg.translate,
+            "provider": cfg.provider,
             "synth": cfg.synth.model_dump(mode="json") if cfg.synth else None,
             "review": cfg.review,
-            "schema": "messages",  # ChatML/ShareGPT-compatible
-            "counts": {"translated": None, "synthetic": None, "accepted": None},
-            "status": "placeholder",
+            "counts": {
+                "generated": len(pairs),
+                "deduped": len(deduped),
+                "accepted": len(accepted),
+            },
         }
-        card_path = write_json(out_dir / "convdata_card.json", plan)
-        synth_n = cfg.synth.n if cfg.synth else 0
+        card_path = write_json(out_dir / "convdata_card.json", card)
         log.info(
-            "[convdata] translate=%s synth_n=%s review=%s",
-            cfg.translate,
-            synth_n,
-            cfg.review,
+            "[convdata] generated=%d deduped=%d accepted=%d",
+            len(pairs),
+            len(deduped),
+            len(accepted),
         )
 
         return StageResult(
             outputs=[ctx.relpath(card_path)],
-            metrics={"translate": len(cfg.translate), "synth_n": synth_n, "review": cfg.review},
+            metrics={"accepted": len(accepted), "deduped": len(deduped)},
         )

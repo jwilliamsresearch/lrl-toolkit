@@ -101,7 +101,7 @@ class PretrainConfig(BaseModel):
 
 
 class SynthConfig(BaseModel):
-    provider: str = Field(default="claude", description="Teacher LLM: claude/openai/local.")
+    provider: str = Field(default="ollama", description="Local teacher LLM: ollama/local/mock.")
     model: str | None = Field(default=None, description="Override the provider's default model.")
     n: int = Field(default=5000, ge=0, description="Number of synthetic pairs to generate.")
     ground_in_corpus: bool = True
@@ -109,8 +109,13 @@ class SynthConfig(BaseModel):
 
 
 class ConvDataConfig(BaseModel):
-    # Names of open instruction datasets to translate into the target language.
+    # Names of open instruction datasets (HF ids or local paths) to translate.
     translate: list[str] = Field(default_factory=list)
+    translate_limit: int | None = Field(
+        default=500, description="Max examples to translate per dataset."
+    )
+    provider: str = Field(default="ollama", description="Local teacher: ollama/local/mock.")
+    model: str | None = Field(default=None, description="Override the provider's default model.")
     synth: SynthConfig | None = None
     review: bool = Field(default=True, description="Route pairs through human review before SFT.")
     model_config = {"extra": "forbid"}
@@ -119,6 +124,8 @@ class ConvDataConfig(BaseModel):
 class FinetuneConfig(BaseModel):
     method: TuneMethod = TuneMethod.qlora
     epochs: float = 3.0
+    max_steps: int | None = Field(default=None, description="Overrides epochs when set.")
+    max_seq_len: int = 1024
     learning_rate: float = 2e-4
     dpo: bool = False
     model_config = {"extra": "forbid"}
@@ -131,6 +138,7 @@ class EvaluateConfig(BaseModel):
 
 
 class ExportConfig(BaseModel):
+    merge_adapter: bool = Field(default=True, description="Merge the LoRA adapter into the base.")
     # Quantization targets, e.g. 'gguf_q4_k_m', 'awq', 'gptq'.
     quantize: list[str] = Field(default_factory=lambda: ["gguf_q4_k_m"])
     push_to_hub: bool = False
