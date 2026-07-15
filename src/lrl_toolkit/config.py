@@ -97,6 +97,13 @@ class PretrainConfig(BaseModel):
     max_steps: int | None = Field(default=None, description="Overrides epochs when set.")
     lora_r: int = 32
     lora_alpha: int = 64
+    embed_init: str = Field(
+        default="subword_mean",
+        description=(
+            "How to initialize embeddings for newly added tokens: 'subword_mean' "
+            "(FOCUS-style mean of base-tokenizer pieces) or 'default' (random)."
+        ),
+    )
     model_config = {"extra": "forbid"}
 
 

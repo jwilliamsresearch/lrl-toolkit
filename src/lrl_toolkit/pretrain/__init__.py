@@ -62,6 +62,7 @@ class PretrainStage(Stage):
             lora_alpha=cfg.lora_alpha,
             seed=ctx.project.config.seed,
             token=_hf_token(),
+            embed_init=cfg.embed_init,
         )
         card_path = write_json(out_dir / "pretrain_card.json", report)
         return StageResult(

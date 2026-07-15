@@ -28,6 +28,71 @@ def _can_use_4bit() -> bool:
         return False
 
 
+def _unsloth_available() -> bool:
+    """Unsloth needs a CUDA GPU; import is deferred so CPU/CI runs never require it."""
+    try:
+        import importlib.util
+
+        import torch
+
+        return importlib.util.find_spec("unsloth") is not None and torch.cuda.is_available()
+    except Exception:
+        return False
+
+
+def _resize_and_init(model, base_id, extended_tokenizer, token, embed_init: str) -> int:
+    """Resize embeddings to the (possibly extended) tokenizer and, when requested,
+    smart-initialize the new tokens. Returns how many tokens were smart-initialized."""
+    from transformers import AutoTokenizer
+
+    old_num = model.get_input_embeddings().weight.shape[0]
+    if len(extended_tokenizer) == old_num:
+        return 0
+    model.resize_token_embeddings(len(extended_tokenizer))
+    if embed_init != "subword_mean":
+        return 0
+    from .embed_init import smart_init_new_embeddings
+
+    base_tok = AutoTokenizer.from_pretrained(base_id, token=token)
+    return smart_init_new_embeddings(model, base_tok, extended_tokenizer, old_num)
+
+
+def _build_unsloth(
+    *, base_id, tokenizer, token, seq_len, use_4bit, lora_r, lora_alpha, seed, embed_init: str
+):
+    """Load the base model through Unsloth, adapt it to the extended tokenizer, and
+    wrap it with a LoRA adapter. Returns (peft_model, n_embed_init).
+
+    Raises on any Unsloth error so the caller can fall back to the HF path.
+    """
+    from unsloth import FastLanguageModel
+
+    model, _ = FastLanguageModel.from_pretrained(
+        model_name=base_id,
+        max_seq_length=seq_len,
+        dtype=None,  # let Unsloth pick (bf16/fp16) for the GPU
+        load_in_4bit=use_4bit,
+        token=token,
+    )
+    # Adapt embeddings to our (possibly extended) tokenizer, then smart-init.
+    n_embed_init = _resize_and_init(model, base_id, tokenizer, token, embed_init)
+    model.config.use_cache = False
+    model = FastLanguageModel.get_peft_model(
+        model,
+        r=lora_r,
+        lora_alpha=lora_alpha,
+        lora_dropout=0.0,  # Unsloth is optimized for dropout-free LoRA
+        bias="none",
+        target_modules=[
+            "q_proj", "k_proj", "v_proj", "o_proj",
+            "gate_proj", "up_proj", "down_proj",
+        ],
+        use_gradient_checkpointing="unsloth",
+        random_state=seed,
+    )
+    return model, n_embed_init
+
+
 def _corpus_texts(corpus_dir: Path) -> Iterator[str]:
     for doc in iter_documents(corpus_dir):
         if doc.text:
@@ -93,6 +158,7 @@ def run_pretraining(
     lora_alpha: int,
     seed: int,
     token: str | None = None,
+    embed_init: str = "subword_mean",
 ) -> dict:
     import torch
     from peft import LoraConfig, get_peft_model
@@ -116,38 +182,57 @@ def run_pretraining(
     on_cuda = torch.cuda.is_available()
     dtype = torch.bfloat16 if (on_cuda and compute.precision == "bf16") else torch.float32
 
-    model_kwargs: dict = {"torch_dtype": dtype, "token": token}
-    if use_4bit:
-        from transformers import BitsAndBytesConfig
+    # Optional Unsloth fast-path (single consumer GPU: ~2x faster, less VRAM).
+    backend = "hf"
+    n_embed_init = 0
+    model = None
+    if getattr(compute, "use_unsloth", False) and _unsloth_available():
+        try:
+            model, n_embed_init = _build_unsloth(
+                base_id=base_id, tokenizer=tokenizer, token=token, seq_len=seq_len,
+                use_4bit=use_4bit, lora_r=lora_r, lora_alpha=lora_alpha, seed=seed,
+                embed_init=embed_init,
+            )
+            backend = "unsloth"
+            method_used = "qlora" if use_4bit else "lora"
+        except Exception as exc:  # never let the fast-path break the run
+            log.warning("[pretrain] Unsloth path failed (%s); falling back to HF.", exc)
+            model = None
 
-        model_kwargs["quantization_config"] = BitsAndBytesConfig(
-            load_in_4bit=True,
-            bnb_4bit_quant_type="nf4",
-            bnb_4bit_compute_dtype=torch.bfloat16,
-        )
-    if want_4bit and not use_4bit:
-        log.warning("[pretrain] QLoRA requested but no CUDA+bitsandbytes; falling back to LoRA.")
-
-    model = AutoModelForCausalLM.from_pretrained(base_id, **model_kwargs)
-    # Match embeddings to the (possibly extended) tokenizer.
-    if len(tokenizer) != model.get_input_embeddings().weight.shape[0]:
-        model.resize_token_embeddings(len(tokenizer))
-    model.config.use_cache = False
-
-    if method_used in ("lora", "qlora"):
+    if model is None:  # standard HuggingFace path
+        model_kwargs: dict = {"torch_dtype": dtype, "token": token}
         if use_4bit:
-            from peft import prepare_model_for_kbit_training
+            from transformers import BitsAndBytesConfig
 
-            model = prepare_model_for_kbit_training(model)
-        lora = LoraConfig(
-            r=lora_r,
-            lora_alpha=lora_alpha,
-            lora_dropout=0.05,
-            bias="none",
-            task_type="CAUSAL_LM",
-            target_modules="all-linear",
-        )
-        model = get_peft_model(model, lora)
+            model_kwargs["quantization_config"] = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_compute_dtype=torch.bfloat16,
+            )
+        if want_4bit and not use_4bit:
+            log.warning(
+                "[pretrain] QLoRA requested but no CUDA+bitsandbytes; falling back to LoRA."
+            )
+
+        model = AutoModelForCausalLM.from_pretrained(base_id, **model_kwargs)
+        # Match embeddings to the (possibly extended) tokenizer + smart-init new tokens.
+        n_embed_init = _resize_and_init(model, base_id, tokenizer, token, embed_init)
+        model.config.use_cache = False
+
+        if method_used in ("lora", "qlora"):
+            if use_4bit:
+                from peft import prepare_model_for_kbit_training
+
+                model = prepare_model_for_kbit_training(model)
+            lora = LoraConfig(
+                r=lora_r,
+                lora_alpha=lora_alpha,
+                lora_dropout=0.05,
+                bias="none",
+                task_type="CAUSAL_LM",
+                target_modules="all-linear",
+            )
+            model = get_peft_model(model, lora)
 
     blocks = _pack_blocks(_corpus_texts(corpus_dir), tokenizer, seq_len, max_blocks=None)
     if not blocks:
@@ -165,7 +250,10 @@ def run_pretraining(
         save_strategy="no",
         report_to=[],
         seed=seed,
-        gradient_checkpointing=compute.gradient_checkpointing and on_cuda,
+        # Unsloth manages its own gradient checkpointing; don't double-enable.
+        gradient_checkpointing=(
+            compute.gradient_checkpointing and on_cuda and backend != "unsloth"
+        ),
         bf16=on_cuda and compute.precision == "bf16",
         fp16=on_cuda and compute.precision == "fp16",
     )
@@ -186,11 +274,14 @@ def run_pretraining(
         "base_model": base_id,
         "method_requested": method,
         "method_used": method_used,
+        "backend": backend,
         "device": "cuda" if on_cuda else "cpu",
         "n_blocks": len(blocks),
         "seq_len": seq_len,
         "steps": int(result.global_step),
         "train_loss": float(result.training_loss),
         "vocab_size": len(tokenizer),
+        "embed_init": embed_init,
+        "embed_init_tokens": n_embed_init,
         "saved_to": str(adapter_dir),
     }
