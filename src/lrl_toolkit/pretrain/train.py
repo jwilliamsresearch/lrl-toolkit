@@ -38,6 +38,13 @@ def _pack_blocks(
     texts: Iterator[str], tokenizer, seq_len: int, max_blocks: int | None
 ) -> list[list[int]]:
     eos = tokenizer.eos_token_id
+    # We deliberately tokenize whole documents and repack them into seq_len
+    # blocks below, so the tokenizer's "sequence longer than model_max_length"
+    # warning is expected and misleading here — pre-arm its once-only flag so it
+    # stays quiet. The full sequence is never fed to the model.
+    if hasattr(tokenizer, "deprecation_warnings"):
+        _key = "sequence-length-is-longer-than-the-specified-maximum"
+        tokenizer.deprecation_warnings[_key] = True
     buf: list[int] = []
     blocks: list[list[int]] = []
     for text in texts:

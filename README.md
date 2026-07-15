@@ -103,6 +103,25 @@ pip install -e ".[train]"     # + training (torch, transformers, peft, trl, ...)
 pip install -e ".[all]"       # everything
 ```
 
+### GPU / platform notes
+
+- **CUDA:** `pip install torch` pulls the **CPU-only** build. For GPU training, install a
+  CUDA build first, then the extras — e.g. for CUDA 12.8:
+  ```bash
+  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+  pip install -e ".[train]"
+  ```
+  Verify with `python -c "import torch; print(torch.cuda.is_available())"`.
+- **Language ID (fastText):** the `clean` stage's language filter uses fastText, which has no
+  wheels for Python ≥ 3.12. `[data]` therefore skips it there and the filter degrades gracefully
+  (all docs kept). On Python ≤ 3.11 install it explicitly with `pip install -e ".[langid]"`.
+- **Windows:** use a venv at a short path (e.g. `C:\venv`) — the deep MS Store Python path plus
+  torch's long internal paths can trip the 260-char limit during install. Prefer running the CLI
+  as `python -m lrl_toolkit.cli ...` (or `python -m streamlit run dashboard/app.py`) if the
+  `Scripts` dir isn't on `PATH`.
+- **Recommended local base model:** on ~8&nbsp;GB VRAM, `qwen2.5-1.5b`/`qwen2.5-3b` (Apache-2.0)
+  train comfortably under QLoRA; the Aya models are stronger for LRLs but want more VRAM.
+
 ## Quickstart
 
 ```bash

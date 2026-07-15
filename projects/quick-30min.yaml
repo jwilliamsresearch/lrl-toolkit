@@ -1,0 +1,46 @@
+# Quick end-to-end project, sized for ~30 minutes on this PC (RTX PRO 1000, 8GB VRAM).
+# All backends are mock/offline so nothing depends on network speed or gated
+# HF downloads except the one small Welsh Wikipedia slice in ingest.
+name: quick-30min
+language: welsh
+base_model: smollm2-360m
+compute: consumer_gpu
+seed: 42
+
+ingest:
+  sources: [wikipedia]     # single small source, no gated/large corpora
+  max_gb: 0.05
+  max_docs_per_source: 2000
+
+clean:
+  lang_id: glotlid
+  dedup: exact
+  min_quality: 0.3
+
+tokenizer:
+  strategy: extend
+  added_tokens: 2000
+
+pretrain:
+  method: qlora
+  max_steps: 150
+  seq_len: 512
+
+convdata:
+  translate: []
+  provider: mock           # deterministic offline teacher, no ollama/API needed
+  synth:
+    provider: mock
+    n: 300
+  review: false
+
+finetune:
+  method: qlora
+  epochs: 1
+
+evaluate:
+  benchmarks: [perplexity]
+
+export:
+  quantize: [gguf_q4_k_m]
+  push_to_hub: false

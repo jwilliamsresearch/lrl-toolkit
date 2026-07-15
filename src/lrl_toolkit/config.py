@@ -208,7 +208,9 @@ class ResolvedProject(BaseModel):
     workdir: Path
     source_path: Path | None = None
 
-    model_config = {"arbitrary_types_allowed": True}
+    # `protected_namespaces=()` silences pydantic's warning about the
+    # `model_profile` field colliding with its reserved `model_` namespace.
+    model_config = {"arbitrary_types_allowed": True, "protected_namespaces": ()}
 
     @property
     def name(self) -> str:

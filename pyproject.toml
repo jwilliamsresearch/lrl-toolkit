@@ -47,11 +47,23 @@ data = [
     "pymupdf>=1.24",
     "mwparserfromhell>=0.6",
     "datasketch>=1.6",
+    # fasttext has no wheels for Python >= 3.12, and building from source needs a
+    # C++ toolchain. Gate it so `[data]` installs cleanly everywhere; the clean
+    # stage's language-ID filter degrades gracefully when fasttext is absent
+    # (see clean/langid.py). Install the [langid] extra to force it where wheels exist.
+    "fasttext-wheel>=0.9.2; python_version < '3.12'",
+]
+# Optional fastText-based language identification (only where wheels/toolchain exist).
+langid = [
     "fasttext-wheel>=0.9.2",
 ]
 # Training / model adaptation stack.
 train = [
     "torch>=2.2",
+    # torchvision keeps transformers' optional vision-model imports satisfied
+    # (avoids ModuleNotFoundError noise when transformers' module tree is walked,
+    # e.g. by the Streamlit dashboard). Pip resolves a version matching torch.
+    "torchvision>=0.17",
     "transformers>=4.44",
     "datasets>=2.18",
     "tokenizers>=0.19",

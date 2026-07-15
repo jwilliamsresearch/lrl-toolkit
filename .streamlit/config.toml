@@ -1,0 +1,7 @@
+[server]
+# Do not crawl site-packages on startup (avoids noisy import probes of
+# optional transformers vision models, and speeds launch).
+fileWatcherType = "none"
+
+[browser]
+gatherUsageStats = false

@@ -53,14 +53,17 @@ def test_tokenizer_extends_and_reports_fertility(tmp_path, tiny_model):
     assert (proj.stage_dir("tokenizer") / "tokenizer").is_dir()
 
 
-def test_pretrain_falls_back_to_lora_on_cpu_and_trains(tmp_path, tiny_model):
+def test_pretrain_falls_back_to_lora_without_4bit_and_trains(tmp_path, tiny_model, monkeypatch):
+    # Force the no-4bit path so the fallback is exercised deterministically,
+    # regardless of whether the test host has a CUDA GPU + bitsandbytes.
+    monkeypatch.setattr("lrl_toolkit.pretrain.train._can_use_4bit", lambda: False)
     proj = _project(tmp_path, tiny_model)
     run_pipeline(proj, stages=["ingest", "clean", "tokenizer"])
     outcome = run_single_stage(proj, "pretrain")
     assert outcome.status == "ran"
 
     card = read_json(proj.stage_dir("pretrain") / "pretrain_card.json")
-    # QLoRA requested, but on CPU it must fall back to LoRA and still train.
+    # QLoRA requested, but without 4-bit it must fall back to LoRA and still train.
     assert card["method_requested"] == "qlora"
     assert card["method_used"] == "lora"
     assert card["steps"] == 2
@@ -68,13 +71,15 @@ def test_pretrain_falls_back_to_lora_on_cpu_and_trains(tmp_path, tiny_model):
     assert (proj.stage_dir("pretrain") / "adapter").is_dir()
 
 
-def test_sft_finetune_trains_on_mock_pairs(tmp_path, tiny_model):
+def test_sft_finetune_trains_on_mock_pairs(tmp_path, tiny_model, monkeypatch):
+    # `finetune.train` imports `_can_use_4bit` into its own namespace, so patch it there.
+    monkeypatch.setattr("lrl_toolkit.finetune.train._can_use_4bit", lambda: False)
     proj = _project(tmp_path, tiny_model)
     run_pipeline(proj, stages=["ingest", "clean", "tokenizer", "pretrain", "convdata"])
     outcome = run_single_stage(proj, "finetune")
     assert outcome.status == "ran"
     card = read_json(proj.stage_dir("finetune") / "finetune_card.json")
-    assert card["method_used"] == "lora"  # QLoRA -> LoRA on CPU
+    assert card["method_used"] == "lora"  # QLoRA -> LoRA without 4-bit
     assert card["steps"] == 2
     assert card["n_examples"] == 8
     assert (proj.stage_dir("finetune") / "adapter").is_dir()
