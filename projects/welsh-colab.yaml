@@ -1,0 +1,58 @@
+# lrl-toolkit demo — a genuine (not toy) Welsh chat model, sized for Google Colab.
+#
+# What makes this real, unlike projects/quick-30min.yaml:
+#   • Qwen2.5-1.5B base (already has some Welsh) instead of a 360M smoke model
+#   • Real instruction data — Dolly + OASST1 machine-translated En->Welsh with
+#     NLLB. No Ollama, no API, no `mock`.
+#   • Continued pretraining + 3 SFT epochs instead of 150 mock steps.
+#
+# Runtime: ~1–3 h on a free Colab T4 (16 GB). The run is fully resumable — if the
+# session drops, just re-run `lrl run` and it continues from the last stage.
+# All sources here are cleanly licensed and NOT gated, so no HF_TOKEN is needed.
+# See notebooks/lrl_colab.ipynb for the 0 → hero walkthrough.
+
+name: welsh-colab
+language: welsh
+base_model: qwen2.5-1.5b       # T4-friendly under QLoRA; qwen2.5-3b / aya-expanse-8b on L4/A100
+compute: consumer_gpu
+seed: 42
+
+ingest:
+  sources: [wikipedia, madlad400]   # non-gated, cleanly licensed (culturax/oscar need HF_TOKEN)
+  max_gb: 2
+
+clean:
+  lang_id: glotlid
+  dedup: minhash
+  min_quality: 0.6
+
+tokenizer:
+  strategy: extend
+  added_tokens: 4000
+
+pretrain:
+  method: qlora
+  max_steps: 1000        # ~1–2 h on a T4. Raise to 3000+ on L4/A100 for a stronger base.
+  seq_len: 1024
+
+convdata:
+  # GENUINE instruction pairs — real datasets translated into Welsh via NLLB.
+  # No `synth:` block => no teacher LLM runs (no Ollama / no mock generation).
+  translate: [dolly, oasst1]
+  translate_limit: 3000        # examples per dataset
+  translate_backend: nllb
+  provider: mock               # unused here (only the `teacher` translate backend would use it)
+  review: false                # unattended run: skip the human-review gate
+
+finetune:
+  method: qlora
+  epochs: 3
+  max_seq_len: 1024
+
+evaluate:
+  benchmarks: [perplexity]     # add chrF/Belebele on Pro; FLORES needs HF_TOKEN
+
+export:
+  quantize: [gguf_q4_k_m]
+  make_ollama_modelfile: true
+  push_to_hub: false           # set true + HF_TOKEN to publish a model card + weights

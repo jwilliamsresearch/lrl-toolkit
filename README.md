@@ -131,6 +131,18 @@ lrl run -c projects/welsh.yaml     # run the full pipeline (resumable)
 lrl dashboard                      # or drive it from the web UI
 ```
 
+### Try it on Colab — 0 → hero
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jwilliamsresearch/lrl-toolkit/blob/main/notebooks/lrl_colab.ipynb)
+
+[`notebooks/lrl_colab.ipynb`](notebooks/lrl_colab.ipynb) trains a **genuine** Welsh
+chat model end-to-end on a free Colab T4 and lets you chat with it — using
+[`projects/welsh-colab.yaml`](projects/welsh-colab.yaml): Qwen2.5-1.5B under QLoRA,
+with real instruction data (Dolly + OASST1 machine-translated to Welsh via NLLB —
+no Ollama, no API, no mock). ~1–3 h, fully resumable. Scale up to `qwen2.5-3b` /
+`aya-expanse-8b` on Colab Pro. (For a 30-minute offline smoke test of the plumbing,
+use [`projects/quick-30min.yaml`](projects/quick-30min.yaml) instead.)
+
 Run a single stage:
 
 ```bash
