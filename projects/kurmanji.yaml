@@ -1,0 +1,52 @@
+# lrl-toolkit project: kurmanji (Kurmanji Kurdish, Latin script)
+# Full adaptation run of Qwen2.5-1.5B on the RTX 4080 (QLoRA 4-bit).
+# Gated sources (oscar, flores) are omitted because no HF_TOKEN is set; add a
+# token and re-add them + the flores benchmark to widen coverage.
+name: kurmanji
+language: kurmanji
+base_model: qwen2.5-1.5b
+compute: consumer_gpu
+seed: 42
+
+ingest:
+  sources: [wikipedia, culturax, madlad400, fineweb2]   # all cleanly-licensed (fineweb2 ODC-BY, auto-added by profile)
+  max_gb: 5
+
+clean:
+  lang_id: glotlid
+  dedup: minhash
+  min_quality: 0.6
+
+tokenizer:
+  strategy: extend
+  added_tokens: 8000
+
+pretrain:
+  method: qlora
+  epochs: 1
+  max_steps: 3000        # cap: ~14h on the 4080 (full epoch would be ~5 days). Raise later for a bigger run.
+  seq_len: 2048
+
+convdata:
+  translate: [dolly]         # open instruction set, translated En->kmr via NLLB
+  translate_limit: 500
+  translate_backend: nllb
+  provider: ollama           # local teacher for synth (ToS-safe)
+  model: qwen2.5:14b
+  synth:
+    provider: ollama
+    model: qwen2.5:14b
+    n: 2000
+  review: false              # unattended run: skip the human-review gate
+
+finetune:
+  method: qlora
+  epochs: 3
+
+evaluate:
+  benchmarks: [perplexity]   # flores dropped (gated); add back with HF_TOKEN
+
+export:
+  quantize: [gguf_q4_k_m]
+  make_ollama_modelfile: true
+  push_to_hub: false

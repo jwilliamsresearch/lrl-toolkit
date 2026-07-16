@@ -13,7 +13,7 @@ from ..corpus import iter_documents
 from ..pipeline.base import Stage, StageContext, StageResult
 from ..utils import get_logger, write_json
 from . import review as review_mod
-from .instruction_sets import load_instruction_set
+from .instruction_sets import load_instruction_set, load_native_set
 from .schema import chat_pair, instruction_of, write_jsonl
 from .teacher import get_teacher
 from .translators import get_translator
@@ -64,6 +64,17 @@ class ConvDataStage(Stage):
                     count += 1
                 log.info("[convdata] translated %d from %s", count, ds_name)
 
+        # --- native target-language instruction sets (used as-is, no MT) - #
+        # Profile-level sources (e.g. Aya for languages Aya covers) plus any
+        # declared on the project config.
+        native_sources = [*lang.instruction_sources, *cfg.native_sets]
+        for ns in native_sources:
+            count = 0
+            for ex in load_native_set(ns):
+                pairs.append(chat_pair(ex["instruction"], ex["response"], source=f"native:{ns.repo}"))
+                count += 1
+            log.info("[convdata] loaded %d native pairs from %s", count, ns.repo)
+
         # --- synthesize native pairs via a teacher LLM ------------------- #
         if cfg.synth and cfg.synth.n > 0:
             teacher = get_teacher(cfg.synth.provider, cfg.synth.model)
@@ -96,6 +107,7 @@ class ConvDataStage(Stage):
             "language": lang_name,
             "translate_datasets": cfg.translate,
             "translate_backend": cfg.translate_backend if cfg.translate else None,
+            "native_sets": [ns.model_dump(mode="json") for ns in native_sources],
             "provider": cfg.provider,
             "synth": cfg.synth.model_dump(mode="json") if cfg.synth else None,
             "review": cfg.review,

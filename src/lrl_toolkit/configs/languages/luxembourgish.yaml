@@ -29,7 +29,7 @@ sources:
   params:
     lang: lb
     variant: clean
-    license: ODC-BY-1.0
+    license: CC-BY-4.0
 - connector: oscar
   params:
     lang: lb
@@ -44,8 +44,3 @@ sources:
     - Tatoeba
     - NLLB
     license: mixed
-- connector: flores
-  params:
-    flores: ltz_Latn
-    license: CC-BY-SA-4.0
-  notes: GATED; set HF_TOKEN.

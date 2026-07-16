@@ -23,7 +23,7 @@ sources:
     params: {lang: cy, license: ODC-BY-1.0}
     notes: CulturaX (cleaned mC4 + OSCAR). May require accepting terms + HF_TOKEN.
   - connector: madlad400
-    params: {lang: cy, variant: clean, license: ODC-BY-1.0}
+    params: {lang: cy, variant: clean, license: CC-BY-4.0}
     notes: Google MADLAD-400, document-level, audited/filtered.
   - connector: oscar
     params: {lang: cy, license: CC0-1.0}
@@ -36,9 +36,6 @@ sources:
   - connector: opus
     params: {src: cy, tgt: en, corpora: [OpenSubtitles, Tatoeba, NLLB, bible-uedin], license: mixed}
     notes: OPUS aggregates OpenSubtitles, Tatoeba, NLLB, bible, and more.
-  - connector: flores
-    params: {flores: cym_Latn, license: CC-BY-SA-4.0}
-    notes: FLORES+ eval/seed data — GATED; accept the license and set HF_TOKEN.
 notes: >
   Welsh is comparatively well-resourced among LRLs, so it is the reference
   language for the smoke pipeline and tutorials.

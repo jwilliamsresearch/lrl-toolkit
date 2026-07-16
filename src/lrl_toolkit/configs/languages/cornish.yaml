@@ -18,7 +18,7 @@ sources:
   - connector: glot500
     params: {glot: cor_Latn, license: mixed}
   - connector: madlad400
-    params: {lang: kw, variant: clean, license: ODC-BY-1.0}
+    params: {lang: kw, variant: clean, license: CC-BY-4.0}
   - connector: opus
     params: {src: kw, tgt: en, corpora: [Tatoeba, bible-uedin], license: mixed}
   - connector: local

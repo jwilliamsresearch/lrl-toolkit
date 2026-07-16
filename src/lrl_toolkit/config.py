@@ -115,9 +115,44 @@ class SynthConfig(BaseModel):
     model_config = {"extra": "forbid"}
 
 
+class NativeSetConfig(BaseModel):
+    """A target-language instruction dataset used *as-is* — no machine translation.
+
+    For datasets that already contain the target language (e.g. xP3x's per-language
+    splits). Rows are mapped to ``{instruction, response}`` and added directly to the
+    SFT set. ``exclude`` drops rows whose ``source_field`` contains any listed
+    substring — use it to keep eval-only corpora (e.g. FLORES) out of training.
+    """
+
+    repo: str = Field(..., description="HF dataset id or local .jsonl path.")
+    name: str | None = Field(
+        default=None, description="HF config name (e.g. an xP3x language like 'kmr_Latn')."
+    )
+    split: str = "train"
+    instruction_field: str = Field(default="inputs", description="Column holding the prompt.")
+    response_field: str = Field(default="targets", description="Column holding the response.")
+    source_field: str = Field(
+        default="dataset", description="Column naming the constituent source, for exclusion."
+    )
+    exclude: list[str] = Field(
+        default_factory=list,
+        description="Drop rows whose source_field contains any of these substrings (e.g. 'flores').",
+    )
+    select_field: str | None = Field(
+        default=None, description="Column to filter on (e.g. 'language_code')."
+    )
+    select_value: str | None = Field(
+        default=None, description="Keep only rows whose select_field equals this."
+    )
+    limit: int | None = Field(default=5000, description="Max rows to take.")
+    model_config = {"extra": "forbid"}
+
+
 class ConvDataConfig(BaseModel):
     # Names of open instruction datasets (HF ids or local paths) to translate.
     translate: list[str] = Field(default_factory=list)
+    # Target-language instruction datasets used as-is (no translation).
+    native_sets: list[NativeSetConfig] = Field(default_factory=list)
     translate_limit: int | None = Field(
         default=500, description="Max examples to translate per dataset."
     )

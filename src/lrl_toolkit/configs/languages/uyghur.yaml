@@ -30,7 +30,7 @@ sources:
   params:
     lang: ug
     variant: clean
-    license: ODC-BY-1.0
+    license: CC-BY-4.0
 - connector: oscar
   params:
     lang: ug
@@ -45,8 +45,3 @@ sources:
     - Tatoeba
     - NLLB
     license: mixed
-- connector: flores
-  params:
-    flores: uig_Arab
-    license: CC-BY-SA-4.0
-  notes: GATED; set HF_TOKEN.

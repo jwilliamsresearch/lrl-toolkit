@@ -20,15 +20,21 @@ sources:
   - connector: culturax
     params: {lang: ckb, license: ODC-BY-1.0}
   - connector: madlad400
-    params: {lang: ckb, variant: clean, license: ODC-BY-1.0}
+    params: {lang: ckb, variant: clean, license: CC-BY-4.0}
   - connector: oscar
     params: {lang: ckb, license: CC0-1.0}
     notes: OSCAR-2301 — GATED; set HF_TOKEN.
   - connector: opus
     params: {src: ckb, tgt: en, corpora: [OpenSubtitles, Tatoeba, NLLB], license: mixed}
-  - connector: flores
-    params: {flores: ckb_Arab, license: CC-BY-SA-4.0}
-    notes: GATED; set HF_TOKEN.
 notes: >
   Right-to-left Arabic script with Kurdish-specific letters. Character
   normalization (ک vs ك, ی vs ي, ە) is essential — see the sorani_arabic rules.
+
+instruction_sources:
+- repo: CohereForAI/aya_dataset
+  instruction_field: inputs
+  response_field: targets
+  select_field: language_code
+  select_value: ckb
+  limit: 5000
+  notes: Aya human-written instructions (Apache-2.0), filtered to ckb.

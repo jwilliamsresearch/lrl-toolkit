@@ -112,3 +112,33 @@ def test_convdata_translate_local_jsonl(tmp_path, offline_configs):
     assert len(accepted) == 3
     # Mock translation tags the target language.
     assert instruction_of(accepted[0]).startswith("[Test Language]")
+
+
+def test_convdata_native_set_used_as_is_and_excludes_flores(tmp_path, offline_configs):
+    # Native target-language instruction data with a `dataset` provenance column.
+    native = tmp_path / "native.jsonl"
+    with native.open("w", encoding="utf-8") as fh:
+        fh.write(json.dumps({"inputs": "Pirs 1", "targets": "Bersiv 1", "dataset": "wikiqa"}) + "\n")
+        fh.write(json.dumps({"inputs": "Pirs 2", "targets": "Bersiv 2", "dataset": "wikiqa"}) + "\n")
+        # A FLORES-derived row that must be filtered out of training.
+        fh.write(json.dumps({"inputs": "MT src", "targets": "MT tgt", "dataset": "flores200"}) + "\n")
+
+    proj = _project(
+        tmp_path,
+        offline_configs,
+        {
+            "translate": [],
+            "native_sets": [
+                {"repo": str(native), "exclude": ["flores"], "limit": 10}
+            ],
+            "review": False,
+        },
+    )
+    run_pipeline(proj, stages=["ingest", "clean", "convdata"])
+    accepted = read_jsonl(proj.stage_dir("convdata") / "accepted.jsonl")
+    # Two wikiqa rows kept, flores row dropped.
+    assert len(accepted) == 2
+    instructions = {instruction_of(p) for p in accepted}
+    assert instructions == {"Pirs 1", "Pirs 2"}
+    # Used as-is: NOT machine-translated (no "[Test Language]" prefix).
+    assert all(not i.startswith("[") for i in instructions)

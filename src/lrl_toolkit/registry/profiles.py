@@ -12,7 +12,40 @@ from __future__ import annotations
 
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+
+# Human script name -> ISO 15924 tag, used to derive dataset codes like
+# ``kmr_Latn`` / ``ckb_Arab`` from a profile's iso639_3 + script.
+_SCRIPT_TAG = {
+    "Latin": "Latn",
+    "Arabic": "Arab",
+    "Cyrillic": "Cyrl",
+    "Ethiopic": "Ethi",
+    "Devanagari": "Deva",
+    "Sinhala": "Sinh",
+    "Tibetan": "Tibt",
+    "Khmer": "Khmr",
+    "Hebrew": "Hebr",
+    "Greek": "Grek",
+    "Armenian": "Armn",
+    "Georgian": "Geor",
+    "Hangul": "Hang",
+    "Thai": "Thai",
+    "Bengali": "Beng",
+    "Tamil": "Taml",
+}
+
+# Languages whose FineWeb-2 config code differs from the derived <iso639_3>_<Script>
+# (usually a macrolanguage iso vs FineWeb-2's specific code). Verified against the
+# live FineWeb-2 config list. Add a line here if a new language needs an override.
+_FINEWEB2_OVERRIDE = {
+    "grn": "gug_Latn",  # Guarani
+    "mon": "khk_Cyrl",  # Mongolian -> Halh
+    "nep": "npi_Deva",  # Nepali (individual)
+    "pus": "pbt_Arab",  # Pashto -> Southern
+    "que": "quy_Latn",  # Quechua -> Ayacucho
+    "swa": "swh_Latn",  # Swahili (individual)
+}
 
 
 class TextDirection(str, Enum):
@@ -31,6 +64,37 @@ class SourceHint(BaseModel):
     connector: str = Field(..., description="Ingest connector name, e.g. 'wikipedia', 'opus'.")
     params: dict = Field(default_factory=dict, description="Connector-specific hints.")
     notes: str | None = Field(default=None, description="Human note about this source.")
+
+    model_config = {"extra": "forbid"}
+
+
+class InstructionSource(BaseModel):
+    """A target-language instruction dataset used as-is (no MT) in the convdata stage.
+
+    Mirrors the shape ``convdata.native_sets`` accepts, but lives on the language
+    profile so it applies to every project for that language (e.g. Aya for the
+    languages Aya covers). Loaded by :func:`lrl_toolkit.convdata.load_native_set`.
+    """
+
+    repo: str = Field(..., description="HF dataset id or local .jsonl path.")
+    name: str | None = Field(default=None, description="HF config name, if the dataset uses one.")
+    split: str = "train"
+    instruction_field: str = "inputs"
+    response_field: str = "targets"
+    source_field: str = Field(
+        default="dataset", description="Column naming the constituent source, for exclusion."
+    )
+    exclude: list[str] = Field(
+        default_factory=list, description="Drop rows whose source_field contains any substring."
+    )
+    select_field: str | None = Field(
+        default=None, description="Column to filter on (e.g. 'language_code' for Aya)."
+    )
+    select_value: str | None = Field(
+        default=None, description="Keep only rows whose select_field equals this."
+    )
+    limit: int | None = 5000
+    notes: str | None = None
 
     model_config = {"extra": "forbid"}
 
@@ -63,6 +127,9 @@ class LanguageProfile(BaseModel):
     family: str | None = Field(default=None, description="Language family, informational.")
     dialects: list[str] = Field(default_factory=list, description="Known dialects/varieties.")
     sources: list[SourceHint] = Field(default_factory=list, description="Corpus source catalog.")
+    instruction_sources: list[InstructionSource] = Field(
+        default_factory=list, description="Native-language instruction datasets for convdata."
+    )
     normalization: NormalizationRules = Field(default_factory=NormalizationRules)
     notes: str | None = None
 
@@ -70,6 +137,37 @@ class LanguageProfile(BaseModel):
 
     def resolved_script(self) -> str:
         return self.default_script or self.scripts[0]
+
+    def lang_script_code(self) -> str:
+        """Derive the standard ``<iso639_3>_<Script>`` code (e.g. 'kmr_Latn').
+
+        Used to address per-language configs of multilingual datasets like
+        FineWeb-2. Kurmanji -> ``kmr_Latn``, Sorani -> ``ckb_Arab``.
+        """
+        script = self.resolved_script()
+        tag = _SCRIPT_TAG.get(script, script[:4].title())
+        return f"{self.iso639_3}_{tag}"
+
+    @model_validator(mode="after")
+    def _add_standard_sources(self) -> LanguageProfile:
+        """Auto-add FineWeb-2 for any language that doesn't already list it.
+
+        Keeps standard web-text coverage DRY: a new language profile only needs
+        iso639_3 + script and gets FineWeb-2 for free, with the correct per-language
+        code. Languages whose FineWeb-2 code differs from the derived one (e.g. macro
+        codes) override by listing ``fineweb2`` explicitly. A language not in
+        FineWeb-2 simply logs and skips that source at ingest.
+        """
+        if not any(s.connector == "fineweb2" for s in self.sources):
+            code = _FINEWEB2_OVERRIDE.get(self.iso639_3, self.lang_script_code())
+            self.sources.append(
+                SourceHint(
+                    connector="fineweb2",
+                    params={"fineweb": code, "license": "ODC-BY-1.0"},
+                    notes="Auto-added: FineWeb-2 web text (ODC-BY-1.0).",
+                )
+            )
+        return self
 
 
 class ModelArch(str, Enum):

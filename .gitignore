@@ -1,30 +1,73 @@
+# ---------------------------------------------------------------------------
 # Python
+# ---------------------------------------------------------------------------
 __pycache__/
 *.py[cod]
+*$py.class
 *.egg-info/
 .eggs/
 build/
 dist/
-.venv/
-venv/
-.env
+*.whl
 
-# Tooling
+# Virtual environments (matches .venv, .venv311, venv, env, ...)
+.venv*/
+venv/
+env/
+ENV/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# ---------------------------------------------------------------------------
+# Tooling / caches
+# ---------------------------------------------------------------------------
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
 .ipynb_checkpoints/
+.coverage
+htmlcov/
 
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+
+# ---------------------------------------------------------------------------
 # lrl-toolkit working data (large / generated artifacts)
+# ---------------------------------------------------------------------------
 projects/*/artifacts/
 projects/*/data/
 projects/*/models/
 projects/*/.lrl/
+projects/**/*.log
+
+# Local scratch / temp run dirs
+.run_tmp/
+.tmp_test/
+*.log
+
+# Model weights & checkpoints (never commit these)
 *.gguf
 *.safetensors
-wandb/
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.onnx
 
+# Experiment trackers / HF cache if placed in-repo
+wandb/
+.cache/
+
+# ---------------------------------------------------------------------------
 # OS
+# ---------------------------------------------------------------------------
 .DS_Store
 Thumbs.db
+
+# Local planning notes (kept out of the repo)
 plan.md

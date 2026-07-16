@@ -13,6 +13,7 @@ from .loader import (
 from .profiles import (
     ComputeProfile,
     Distributed,
+    InstructionSource,
     LanguageProfile,
     ModelArch,
     ModelProfile,
@@ -25,6 +26,7 @@ from .profiles import (
 __all__ = [
     "ComputeProfile",
     "Distributed",
+    "InstructionSource",
     "LanguageProfile",
     "ModelArch",
     "ModelProfile",

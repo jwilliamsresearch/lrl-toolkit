@@ -29,7 +29,7 @@ sources:
   params:
     lang: eu
     variant: clean
-    license: ODC-BY-1.0
+    license: CC-BY-4.0
 - connector: oscar
   params:
     lang: eu
@@ -44,8 +44,12 @@ sources:
     - Tatoeba
     - NLLB
     license: mixed
-- connector: flores
-  params:
-    flores: eus_Latn
-    license: CC-BY-SA-4.0
-  notes: GATED; set HF_TOKEN.
+
+instruction_sources:
+- repo: CohereForAI/aya_dataset
+  instruction_field: inputs
+  response_field: targets
+  select_field: language_code
+  select_value: eus
+  limit: 5000
+  notes: Aya human-written instructions (Apache-2.0), filtered to eus.

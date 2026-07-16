@@ -96,3 +96,20 @@ class OscarConnector(_HFStreamConnector):
             raise ValueError("oscar source needs params.lang (e.g. 'cy').")
         # OSCAR-2301 selects the split via `language=`, not `name=`.
         return {"path": "oscar-corpus/OSCAR-2301", "language": lang}
+
+
+class FineWeb2Connector(_HFStreamConnector):
+    """FineWeb-2: cleaned, deduplicated CommonCrawl web text for 1800+ languages.
+
+    Configs are named ``<iso639_3>_<Script>`` (e.g. ``kmr_Latn``, ``ckb_Arab``) —
+    each language/script is a separate config, so Kurmanji and Sorani never mix.
+    Released under ODC-BY-1.0.
+    """
+
+    name = "fineweb2"
+
+    def _load_kwargs(self, hint: SourceHint) -> dict:
+        code = hint.params.get("fineweb") or hint.params.get("lang_script")
+        if not code:
+            raise ValueError("fineweb2 source needs params.fineweb (e.g. 'kmr_Latn').")
+        return {"path": "HuggingFaceFW/fineweb-2", "name": code}

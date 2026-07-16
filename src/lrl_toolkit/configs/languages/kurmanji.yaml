@@ -20,15 +20,12 @@ sources:
   - connector: culturax
     params: {lang: ku, license: ODC-BY-1.0}
   - connector: madlad400
-    params: {lang: ku, variant: clean, license: ODC-BY-1.0}
+    params: {lang: ku, variant: clean, license: CC-BY-4.0}
   - connector: oscar
     params: {lang: ku, license: CC0-1.0}
     notes: OSCAR-2301 — GATED; set HF_TOKEN.
   - connector: opus
     params: {src: ku, tgt: en, corpora: [OpenSubtitles, Tatoeba, NLLB], license: mixed}
-  - connector: flores
-    params: {flores: kmr_Latn, license: CC-BY-SA-4.0}
-    notes: GATED; set HF_TOKEN.
 notes: >
   Kurmanji is written in Latin script; Sorani (ckb) is a separate profile in
   Arabic script. Keep the two apart — script/dialect is a first-class axis here.

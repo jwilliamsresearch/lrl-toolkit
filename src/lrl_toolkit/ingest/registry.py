@@ -7,6 +7,7 @@ from .connectors.commoncrawl import CommonCrawlConnector
 from .connectors.flores import FloresConnector
 from .connectors.hf_stream import (
     CulturaXConnector,
+    FineWeb2Connector,
     Glot500Connector,
     OscarConnector,
     WikipediaConnector,
@@ -22,6 +23,7 @@ _CONNECTORS: dict[str, BaseConnector] = {
         WikipediaConnector(),
         Glot500Connector(),
         CulturaXConnector(),
+        FineWeb2Connector(),
         OscarConnector(),
         MadladConnector(),
         CommonCrawlConnector(),

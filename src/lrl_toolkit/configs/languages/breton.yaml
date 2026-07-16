@@ -29,7 +29,7 @@ sources:
   params:
     lang: br
     variant: clean
-    license: ODC-BY-1.0
+    license: CC-BY-4.0
 - connector: oscar
   params:
     lang: br
