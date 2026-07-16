@@ -1,0 +1,116 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Quickstart from '../components/Quickstart.astro';
+import Pipeline from '../components/Pipeline.astro';
+import Features from '../components/Features.astro';
+import Languages from '../components/Languages.astro';
+import Footer from '../components/Footer.astro';
+
+const title = 'lrl-toolkit — build a language model for any low-resource language';
+const description =
+  'A config-driven, open-source pipeline that takes a low-resource language from an ISO code to a fine-tuned, evaluated, publishable chat model — on a single consumer GPU.';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#05080a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- no-flash theme init: runs before paint -->
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('lrl-theme');
+          var theme =
+            stored ||
+            (window.matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <Nav />
+    <main>
+      <Hero />
+      <Quickstart />
+      <Pipeline />
+      <Features />
+      <Languages />
+      <Footer />
+    </main>
+
+    <script>
+      // ---- Theme toggle -----------------------------------------------------
+      const root = document.documentElement;
+      const toggle = document.getElementById('theme-toggle');
+      toggle?.addEventListener('click', () => {
+        const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        root.setAttribute('data-theme', next);
+        try { localStorage.setItem('lrl-theme', next); } catch (e) {}
+        const meta = document.querySelector('meta[name="theme-color"]');
+        meta?.setAttribute('content', next === 'light' ? '#f5f8f6' : '#05080a');
+      });
+
+      // ---- Quickstart tabs --------------------------------------------------
+      const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('.qs-tab'));
+      const panes = Array.from(document.querySelectorAll<HTMLElement>('.qs-pane'));
+      tabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+          const id = tab.dataset.tab;
+          tabs.forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+          panes.forEach((p) => p.setAttribute('data-active', String(p.id === `pane-${id}`)));
+        });
+      });
+
+      // ---- Copy button ------------------------------------------------------
+      const copyBtn = document.getElementById('qs-copy');
+      copyBtn?.addEventListener('click', async () => {
+        const active = document.querySelector<HTMLElement>('.qs-pane[data-active="true"]');
+        const text = active?.dataset.copy || '';
+        try {
+          await navigator.clipboard.writeText(text);
+          copyBtn.textContent = 'Copied ✓';
+          setTimeout(() => (copyBtn.textContent = 'Copy'), 1600);
+        } catch (e) {
+          copyBtn.textContent = 'Copy failed';
+          setTimeout(() => (copyBtn.textContent = 'Copy'), 1600);
+        }
+      });
+
+      // ---- Reveal on scroll -------------------------------------------------
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const reveals = Array.from(document.querySelectorAll('.reveal'));
+      if (reduce) {
+        reveals.forEach((el) => el.classList.add('in'));
+      } else {
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add('in');
+                io.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+        );
+        reveals.forEach((el) => io.observe(el));
+      }
+    </script>
+  </body>
+</html>

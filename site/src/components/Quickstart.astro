@@ -1,0 +1,99 @@
+---
+const tabs = [
+  {
+    id: 'install',
+    label: 'Install',
+    lines: [
+      { c: '# clone, then install everything (data + train extras)' },
+      { p: 'git clone https://github.com/jwilliamsresearch/lrl-toolkit' },
+      { p: 'cd lrl-toolkit' },
+      { p: 'pip install -e ".[all]"' },
+    ],
+  },
+  {
+    id: 'quickstart',
+    label: 'Quickstart',
+    beta: false,
+    lines: [
+      { p: 'lrl init welsh', c: '# scaffold a project config' },
+      { p: 'lrl sources list welsh', c: '# see which corpora are available' },
+      { p: 'lrl run -c projects/welsh.yaml', c: '# run the full pipeline (resumable)' },
+      { p: 'lrl dashboard', c: '# …or drive it from the web UI' },
+    ],
+  },
+  {
+    id: 'gpu',
+    label: 'GPU · CUDA',
+    lines: [
+      { c: '# install a CUDA build of torch first, then the extras' },
+      { p: 'pip install torch torchvision \\' },
+      { p: '  --index-url https://download.pytorch.org/whl/cu128' },
+      { p: 'pip install -e ".[train]"' },
+      { p: 'python -c "import torch; print(torch.cuda.is_available())"' },
+    ],
+  },
+  {
+    id: 'stages',
+    label: 'Single stage',
+    lines: [
+      { p: 'lrl ingest   -c projects/welsh.yaml' },
+      { p: 'lrl clean    -c projects/welsh.yaml' },
+      { p: 'lrl tokenizer -c projects/welsh.yaml' },
+      { p: 'lrl pretrain -c projects/welsh.yaml' },
+    ],
+  },
+];
+---
+<section class="section" id="quickstart">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="eyebrow">Quick start</span>
+      <h2>One config in. A chat model out.</h2>
+      <p>QLoRA / 4-bit defaults that run on Colab, Kaggle, or an 8&nbsp;GB card. Every stage reads the same validated YAML and is fully resumable.</p>
+    </div>
+
+    <div class="qs-panel reveal">
+      <div class="qs-tabs" role="tablist" aria-label="Quick start commands">
+        {tabs.map((t, i) => (
+          <button
+            class="qs-tab"
+            role="tab"
+            id={`tab-${t.id}`}
+            aria-controls={`pane-${t.id}`}
+            aria-selected={i === 1 ? 'true' : 'false'}
+            data-tab={t.id}
+          >
+            {t.label}
+            {t.beta && <span class="beta">beta</span>}
+          </button>
+        ))}
+      </div>
+
+      <div class="qs-body">
+        <button class="qs-copy" id="qs-copy" type="button">Copy</button>
+        {tabs.map((t, i) => (
+          <div
+            class="qs-pane"
+            role="tabpanel"
+            id={`pane-${t.id}`}
+            aria-labelledby={`tab-${t.id}`}
+            data-active={i === 1 ? 'true' : 'false'}
+            data-copy={t.lines.filter((l) => 'p' in l && l.p).map((l) => (l as { p: string }).p).join('\n')}
+          >
+            <pre class="qs-code"><code>{t.lines.map((ln) => (
+              <>
+                {'p' in ln && ln.p ? <><span class="p">$</span> {ln.p}</> : null}
+                {'c' in ln && ln.c ? <span class="c">{('p' in ln && ln.p) ? '   ' + ln.c : ln.c}</span> : null}
+                {'\n'}
+              </>
+            ))}</code></pre>
+          </div>
+        ))}
+      </div>
+
+      <div class="qs-foot">
+        <b>Not on PyPI yet</b> — alpha (M5). Extras: <b>.[data]</b> ingestion · <b>.[train]</b> training · <b>.[all]</b> both. On Windows, use a venv at a short path.
+      </div>
+    </div>
+  </div>
+</section>

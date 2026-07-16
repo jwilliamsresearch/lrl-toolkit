@@ -1,0 +1,71 @@
+---
+const repo = 'https://github.com/jwilliamsresearch/lrl-toolkit';
+const blob = `${repo}/blob/main`;
+---
+<section class="section" style="padding-bottom:20px">
+  <div class="wrap">
+    <div class="cta reveal">
+      <span class="eyebrow">Alpha · M5 — full pipeline runs end-to-end</span>
+      <h2>Take a language from ISO code to model.</h2>
+      <p>Contributions of new language profiles, source connectors, and native-speaker review are especially welcome.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href={repo}>Open the repo</a>
+        <a class="btn btn-ghost" href={`${blob}/README.md`}>Read the docs</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="brand-col">
+        <a class="brand" href="/">
+          <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+            <g fill="none" stroke="var(--accent)" stroke-width="1.6">
+              <circle cx="16" cy="16" r="9"/>
+              <ellipse cx="16" cy="16" rx="3.6" ry="9"/>
+              <line x1="7" y1="16" x2="25" y2="16"/>
+              <path d="M8.5 11 h15 M8.5 21 h15" stroke-width="1.1" opacity="0.7"/>
+            </g>
+          </svg>
+          <span>lrl<span class="dim">-</span>toolkit</span>
+        </a>
+        <p class="blurb">A config-driven, open-source pipeline for building custom language models for low-resource languages. Built for Welsh, Kurdish, Cornish, and beyond.</p>
+      </div>
+
+      <div>
+        <h4>Project</h4>
+        <ul>
+          <li><a href={repo}>GitHub</a></li>
+          <li><a href={`${blob}/README.md`}>README</a></li>
+          <li><a href={`${repo}#roadmap`}>Roadmap</a></li>
+          <li><a href={`${blob}/LICENSE`}>License · Apache-2.0</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Contribute</h4>
+        <ul>
+          <li><a href={`${blob}/CONTRIBUTING.md`}>Contributing</a></li>
+          <li><a href={`${blob}/GOVERNANCE.md`}>Governance</a></li>
+          <li><a href={`${blob}/CODE_OF_CONDUCT.md`}>Code of Conduct</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Ethics</h4>
+        <ul>
+          <li><a href={`${blob}/DATA_ETHICS.md`}>Data ethics</a></li>
+          <li><a href={`${repo}/issues`}>Issues</a></li>
+          <li><a href={`${repo}/discussions`}>Discussions</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 lrl-toolkit · Apache-2.0</span>
+      <span>Models &amp; datasets are governed by the licenses of their source data.</span>
+    </div>
+  </div>
+</footer>

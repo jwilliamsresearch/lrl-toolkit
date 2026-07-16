@@ -1,0 +1,31 @@
+---
+const stages = [
+  { i: '01', name: 'ingest', desc: 'Raw sharded corpus + provenance records, pulled from 9 LRL source connectors.' },
+  { i: '02', name: 'clean', desc: 'Deduped, language-filtered, normalized text with a generated data card.' },
+  { i: '03', name: 'tokenizer', desc: 'Base tokenizer extended for the target script — fertility reported.' },
+  { i: '04', name: 'pretrain', desc: 'Continued pretraining on a strong multilingual base (LoRA / QLoRA adapter).' },
+  { i: '··', name: 'convdata', desc: 'Reviewed chat pairs: translate + synthesize + native-speaker review.', aux: true },
+  { i: '05', name: 'finetune', desc: 'Instruction-tuned chat model via TRL (SFT ± DPO).' },
+  { i: '06', name: 'evaluate', desc: 'Model report card: held-out perplexity, chrF, Belebele, LLM judge.' },
+  { i: '07', name: 'export', desc: 'Merged / quantized weights (GGUF · Ollama) + a Hugging Face model card.' },
+];
+---
+<section class="section" id="pipeline">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">The pipeline</span>
+      <h2>Eight stages, one managed run.</h2>
+      <p>Each stage reads the same config and writes a manifest, so the whole thing is reproducible and resumable. <code style="font-family:var(--font-mono);color:var(--accent)">convdata</code> runs as a parallel branch feeding fine-tuning.</p>
+    </div>
+
+    <div class="pipe">
+      {stages.map((s) => (
+        <div class={`stage reveal${s.aux ? ' aux' : ''}`}>
+          <div class="idx">{s.aux ? 'branch' : `stage ${s.i}`}</div>
+          <h3>{s.name}</h3>
+          <p>{s.desc}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

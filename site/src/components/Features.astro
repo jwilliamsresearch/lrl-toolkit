@@ -1,0 +1,55 @@
+---
+const features = [
+  {
+    title: 'Config over code',
+    body: 'One YAML per language project. Every stage reads the same validated config, writes a manifest, and is fully resumable — re-run a stage without redoing the rest.',
+    icon: '<path d="M4 5h16M4 12h10M4 19h16" stroke-linecap="round"/>',
+  },
+  {
+    title: 'Adapt, don\'t pretrain',
+    body: 'Continued pretraining + tokenizer extension + instruction tuning on a strong multilingual base — Llama, Qwen, Gemma, Aya, XLM-R. Best quality per dollar, no from-scratch runs.',
+    icon: '<path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5" stroke-linecap="round" stroke-linejoin="round"/>',
+  },
+  {
+    title: 'Consumer-GPU first',
+    body: 'QLoRA / 4-bit defaults that run on Colab, Kaggle, or an 8&nbsp;GB card. Automatic QLoRA→LoRA→CPU fallback when there\'s no GPU. A100 and multi-GPU are alternate profiles.',
+    icon: '<rect x="4" y="7" width="16" height="10" rx="2"/><path d="M8 7V5M16 7V5M9 17v2M15 17v2" stroke-linecap="round"/>',
+  },
+  {
+    title: 'Provenance & ethics, first-class',
+    body: 'Every datum carries a license and source record. Export is <b>blocked</b> until all licenses resolve. A review queue puts native speakers in the loop before fine-tuning.',
+    icon: '<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>',
+  },
+  {
+    title: 'Conversational data, three ways',
+    body: 'Translate open instruction sets (NLLB, M2M-100, OPUS-MT, MADLAD), synthesize native pairs with a local teacher LLM, then review — all on open-weight models, no proprietary APIs.',
+    icon: '<path d="M4 5h16v10H10l-4 4V5Z" stroke-linejoin="round"/><path d="M8 9h8M8 12h5" stroke-linecap="round"/>',
+  },
+  {
+    title: 'Drive it from the dashboard',
+    body: 'A Streamlit app: a wizard to generate a project, a run monitor with report cards, the review queue, and a chat window to talk to the model you just trained.',
+    icon: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13v3M12 12v4M16 14v2" stroke-linecap="round"/>',
+  },
+];
+---
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Why lrl-toolkit</span>
+      <h2>Built for the messy reality of low-resource languages.</h2>
+      <p>Scattered corpora, varying scripts and dialects, and instruction data that barely exists — made into a managed, reproducible, one-config workflow.</p>
+    </div>
+
+    <div class="features">
+      {features.map((f) => (
+        <div class="feature reveal">
+          <div class="ficon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" set:html={f.icon}></svg>
+          </div>
+          <h3>{f.title}</h3>
+          <p set:html={f.body}></p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

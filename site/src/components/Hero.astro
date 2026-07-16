@@ -1,0 +1,231 @@
+---
+// Hero + morphing multilingual ASCII globe
+---
+<section class="hero">
+  <div class="hero-canvas-wrap" aria-hidden="true">
+    <canvas id="ascii-canvas"></canvas>
+  </div>
+
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <h1>Give <em>every</em> language<br />a model of its own.</h1>
+
+      <p class="sub">
+        A config-driven, open-source pipeline that takes <b>any</b> low-resource
+        language — on <b>any</b> multilingual base model — from an ISO code to a
+        fine-tuned, evaluated, publishable chat model on a single consumer GPU.
+      </p>
+
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="#quickstart">
+          Get started
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/jwilliamsresearch/lrl-toolkit">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.32c-2.23.48-2.7-1.08-2.7-1.08-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.71 1.23 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          Star on GitHub
+        </a>
+      </div>
+
+      <p class="hero-note"># ingest → clean → tokenizer → pretrain → convdata → finetune → evaluate → export</p>
+    </div>
+  </div>
+
+  <a class="hero-scroll" href="#stats" aria-label="Scroll to details">
+    <span></span>
+  </a>
+</section>
+
+<section class="stats-section" id="stats">
+  <div class="wrap">
+    <div class="stats reveal">
+      <div class="stat"><div class="n">33</div><div class="l">languages</div></div>
+      <div class="stat"><div class="n">19</div><div class="l">base models</div></div>
+      <div class="stat"><div class="n">9</div><div class="l">data connectors</div></div>
+      <div class="stat"><div class="n">8</div><div class="l">pipeline stages</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">YAML per project</div></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // ---- Morphing multilingual ASCII globe ------------------------------------
+  const canvas = document.getElementById('ascii-canvas') as HTMLCanvasElement | null;
+  if (canvas) {
+    const ctx = canvas.getContext('2d')!;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Glyphs drawn from the scripts of supported languages.
+    const GLYPHS = (
+      'lrltoolkitwŵŷâêîôûabcdefghij' +           // Latin / Welsh, Cornish
+      'اببپتثجچحخدذرڕزژسشعغفقکگلڵمنوۆهیێ' +      // Arabic — Kurdish, Farsi, Pashto, Uyghur
+      'ሀለሐመሠረሰሸቀበተኀነአከወዐዘየደገጠጰጸፀፈፐ' +          // Ge'ez — Amharic, Tigrinya
+      'ཀཁགངཅཆཇཉཏཐདནཔཕབམཙཚཛཝཞའཡརལཤསཧ' +          // Tibetan
+      'кбвгджзиклмнпрстфхцчшщ' +                  // Cyrillic — Mongolian, etc.
+      'कखगघचछजझटठडणतथदधनपफबभमयरलवशषसह' +          // Devanagari — Nepali
+      'កខគឃងចឆជឈញដឋឌធនបផពភមយរលវសហ'              // Khmer
+    ).split('');
+
+    // Fibonacci sphere point cloud.
+    const N = 1500;
+    const pts: number[][] = [];
+    const off = 2 / N;
+    const inc = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < N; i++) {
+      const y = i * off - 1 + off / 2;
+      const r = Math.sqrt(Math.max(0, 1 - y * y));
+      const phi = i * inc;
+      pts.push([Math.cos(phi) * r, y, Math.sin(phi) * r]);
+    }
+
+    let W = 0, H = 0, dpr = 1;
+    let cellW = 8, cellH = 12, cols = 0, rows = 0, fontPx = 13;
+    let glyph: Int16Array = new Int16Array(0);
+    let swapAt: Float32Array = new Float32Array(0);
+    let noise: Float32Array = new Float32Array(0);
+
+    function resize() {
+      const rect = canvas!.getBoundingClientRect();
+      W = Math.max(1, rect.width);
+      H = Math.max(1, rect.height);
+      dpr = Math.min(2, window.devicePixelRatio || 1);
+      canvas!.width = Math.floor(W * dpr);
+      canvas!.height = Math.floor(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      fontPx = Math.max(10, Math.min(15, W / 88));
+      cellW = fontPx * 0.66;
+      cellH = fontPx * 1.02;
+      cols = Math.max(1, Math.floor(W / cellW));
+      rows = Math.max(1, Math.floor(H / cellH));
+
+      const total = cols * rows;
+      glyph = new Int16Array(total);
+      swapAt = new Float32Array(total);
+      noise = new Float32Array(total);
+      for (let i = 0; i < total; i++) {
+        glyph[i] = (Math.random() * GLYPHS.length) | 0;
+        swapAt[i] = Math.random() * 2000;
+        // stable sparse background noise
+        const n = Math.sin(i * 12.9898) * 43758.5453;
+        noise[i] = n - Math.floor(n);
+      }
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `${fontPx}px ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace`;
+    }
+
+    // theme-aware colours: [dim rgb, accent rgb]
+    function palette(): [number[], number[]] {
+      const light = document.documentElement.getAttribute('data-theme') === 'light';
+      return light
+        ? [[123, 145, 140], [13, 148, 136]]
+        : [[120, 145, 141], [45, 212, 191]];
+    }
+
+    function draw(t: number) {
+      ctx.clearRect(0, 0, W, H);
+      ctx.font = `${fontPx}px ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace`;
+      const [dim, acc] = palette();
+
+      // rotate the sphere; project to a cell-intensity buffer
+      const ay = reduce ? 0.6 : t * 0.00022;
+      const ax = -0.42;
+      const cay = Math.cos(ay), say = Math.sin(ay);
+      const cax = Math.cos(ax), sax = Math.sin(ax);
+      // globe sits right-of-centre on wide screens (text overlaps its left
+      // fringe); centred on narrow screens.
+      const mobile = W < 760;
+      const cxp = mobile ? W * 0.5 : W * 0.66;
+      const cyp = H * 0.48;
+      const Rpx = Math.min(mobile ? W * 0.44 : W * 0.32, H * 0.42);
+      const inten = new Float32Array(cols * rows); // 0 = none
+
+      for (let i = 0; i < N; i++) {
+        const p = pts[i];
+        // rotate X then Y
+        let y = p[1] * cax - p[2] * sax;
+        let z = p[1] * sax + p[2] * cax;
+        let x = p[0] * cay + z * say;
+        z = -p[0] * say + z * cay;
+        if (z < 0) continue; // back hemisphere
+        const sx = cxp + x * Rpx;
+        const sy = cyp + y * Rpx;
+        const c = (sx / cellW) | 0;
+        const r = (sy / cellH) | 0;
+        if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
+        const idx = r * cols + c;
+        const v = 0.55 + 0.45 * z;
+        if (v > inten[idx]) inten[idx] = v;
+      }
+
+      const now = t;
+      for (let idx = 0; idx < cols * rows; idx++) {
+        let v = inten[idx];
+        const isGlobe = v > 0;
+        if (!isGlobe) {
+          if (noise[idx] > 0.9) v = 0.12 + noise[idx] * 0.06; // sparse ambient
+          else continue;
+        }
+        // morph the glyph on a per-cell timer (globe cells morph faster)
+        if (now > swapAt[idx]) {
+          glyph[idx] = (Math.random() * GLYPHS.length) | 0;
+          swapAt[idx] = now + (isGlobe ? 380 + Math.random() * 1200 : 900 + Math.random() * 2400);
+        }
+        const c = idx % cols;
+        const r = (idx / cols) | 0;
+        const x = c * cellW + cellW / 2;
+        const y = r * cellH + cellH / 2;
+
+        // interpolate dim -> accent by intensity, plus brightness
+        const k = Math.min(1, v);
+        const rr = Math.round(dim[0] + (acc[0] - dim[0]) * k);
+        const gg = Math.round(dim[1] + (acc[1] - dim[1]) * k);
+        const bb = Math.round(dim[2] + (acc[2] - dim[2]) * k);
+        const alpha = isGlobe ? 0.35 + 0.65 * k : 0.5;
+        ctx.globalAlpha = alpha;
+        if (v > 0.78) {
+          ctx.shadowColor = `rgb(${acc[0]},${acc[1]},${acc[2]})`;
+          ctx.shadowBlur = 7;
+        } else {
+          ctx.shadowBlur = 0;
+        }
+        ctx.fillStyle = `rgb(${rr},${gg},${bb})`;
+        ctx.fillText(GLYPHS[glyph[idx]], x, y);
+      }
+      ctx.globalAlpha = 1;
+      ctx.shadowBlur = 0;
+    }
+
+    let raf = 0;
+    let last = 0;
+    function loop(t: number) {
+      if (t - last > 38) { // ~26fps for a chunky ASCII feel
+        draw(t);
+        last = t;
+      }
+      raf = requestAnimationFrame(loop);
+    }
+
+    function start() {
+      resize();
+      if (reduce) { draw(1); return; }
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(loop);
+    }
+
+    const ro = new ResizeObserver(() => resize());
+    ro.observe(canvas);
+    start();
+
+    // pause when off-screen to save cycles
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (reduce) return;
+        if (e.isIntersecting) { if (!raf) { raf = requestAnimationFrame(loop); } }
+        else { cancelAnimationFrame(raf); raf = 0; }
+      }
+    }, { threshold: 0 });
+    io.observe(canvas);
+  }
+</script>
