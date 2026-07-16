@@ -1,0 +1,12 @@
+hf_id: Qwen/Qwen3-1.7B-Base
+family: qwen
+arch: decoder
+tokenizer_type: bpe
+context_length: 32768
+good_for_lrl: true
+notes: >
+  Qwen3 1.7B base (Apache-2.0) — a newer, stronger small multilingual base than
+  Qwen2.5-1.5B, with broad language coverage and a large tokenizer. A sensible
+  consumer-GPU default. Requires transformers >= 4.51 for the Qwen3 architecture.
+  Use the post-trained Qwen/Qwen3-1.7B (not -Base) only if skipping continued
+  pretraining.

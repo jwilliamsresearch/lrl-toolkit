@@ -1,19 +1,33 @@
-# lrl-toolkit demo — a genuine (not toy) Welsh chat model, sized for Google Colab.
+# lrl-toolkit demo — a genuine, publishable Welsh chat model, sized for Google Colab.
 #
-# What makes this real, unlike projects/quick-30min.yaml:
-#   • Qwen2.5-1.5B base (already has some Welsh) instead of a 360M smoke model
-#   • Real instruction data — Dolly + OASST1 machine-translated En->Welsh with
-#     NLLB. No Ollama, no API, no `mock`.
-#   • Continued pretraining + 3 SFT epochs instead of 150 mock steps.
+# Runs the whole pipeline (ingest -> clean -> tokenizer -> pretrain -> convdata ->
+# finetune -> evaluate -> export) end-to-end in ~1-3 h on a free Colab T4, and
+# produces a model you can release. Walkthrough: notebooks/lrl_colab.ipynb.
 #
-# Runtime: ~1–3 h on a free Colab T4 (16 GB). The run is fully resumable — if the
-# session drops, just re-run `lrl run` and it continues from the last stage.
-# All sources here are cleanly licensed and NOT gated, so no HF_TOKEN is needed.
-# See notebooks/lrl_colab.ipynb for the 0 → hero walkthrough.
+# Unlike projects/quick-30min.yaml (a mock smoke test), this is real:
+#   * Qwen3-1.7B-Base (Apache-2.0) instead of a 360M smoke model
+#   * real instruction data: Dolly + OASST1 machine-translated to Welsh (no Ollama, no mock)
+#   * continued pretraining + 3 SFT epochs
+# All sources are non-gated, so no HF_TOKEN is needed. The run is fully resumable.
+#
+# LICENSE / releasability -- chosen so the output is cleanly redistributable:
+#   Qwen3-1.7B ......... Apache-2.0   (base)
+#   Welsh Wikipedia .... CC-BY-SA-4.0 (attribution + share-alike)
+#   MADLAD-400 ......... CC-BY-4.0    (attribution)
+#   Dolly .............. CC-BY-SA-3.0 (share-alike; 4.0-compatible)
+#   OASST1 ............. Apache-2.0
+#   m2m100 (translator)  MIT
+#   => release the model as CC-BY-SA-4.0, with attribution. No NonCommercial conflict.
+#
+# Higher translation quality? Set `translate_backend: nllb` below. NLLB is the best MT
+# for low-resource languages, BUT it is CC-BY-NC-4.0 -- that NonCommercial term
+# conflicts with Wikipedia's ShareAlike, so the model is then NOT cleanly releasable
+# (publish as `license: other` + disclosure instead). Clean release (m2m100) vs best
+# quality (nllb) is the only knob that changes here.
 
 name: welsh-colab
 language: welsh
-base_model: qwen2.5-1.5b       # T4-friendly under QLoRA; qwen2.5-3b / aya-expanse-8b on L4/A100
+base_model: qwen3-1.7b         # Qwen3 base (Apache-2.0), newer + T4-friendly. Scale up: qwen3-4b on L4/A100
 compute: consumer_gpu
 seed: 42
 
@@ -32,16 +46,16 @@ tokenizer:
 
 pretrain:
   method: qlora
-  max_steps: 1000        # ~1–2 h on a T4. Raise to 3000+ on L4/A100 for a stronger base.
+  max_steps: 1000        # ~1-2 h on a T4. Raise to 3000+ on L4/A100 for a stronger base.
   seq_len: 1024
 
 convdata:
-  # GENUINE instruction pairs — real datasets translated into Welsh via NLLB.
+  # GENUINE instruction pairs — real datasets translated into Welsh.
   # No `synth:` block => no teacher LLM runs (no Ollama / no mock generation).
   translate: [dolly, oasst1]
   translate_limit: 3000        # examples per dataset
-  translate_backend: nllb
-  provider: mock               # unused here (only the `teacher` translate backend would use it)
+  translate_backend: m2m100    # MIT — permissive, keeps the model releasable. Swap to `nllb` for best quality (non-commercial).
+  provider: mock               # unused here (only the `teacher` backend would use it)
   review: false                # unattended run: skip the human-review gate
 
 finetune:
@@ -50,9 +64,9 @@ finetune:
   max_seq_len: 1024
 
 evaluate:
-  benchmarks: [perplexity]     # add chrF/Belebele on Pro; FLORES needs HF_TOKEN
+  benchmarks: [perplexity]     # held-out perplexity report card
 
 export:
   quantize: [gguf_q4_k_m]
   make_ollama_modelfile: true
-  push_to_hub: false           # set true + HF_TOKEN to publish a model card + weights
+  push_to_hub: false           # publish manually — see notebooks/lrl_colab.ipynb, step 10
