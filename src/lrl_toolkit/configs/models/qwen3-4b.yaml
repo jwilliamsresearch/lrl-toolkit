@@ -1,0 +1,11 @@
+hf_id: Qwen/Qwen3-4B-Base
+family: qwen
+arch: decoder
+tokenizer_type: bpe
+context_length: 32768
+good_for_lrl: true
+notes: >
+  Qwen3 4B base (Apache-2.0) — the clean-licensed scale-up from qwen3-1.7b. Noticeably
+  stronger, and still QLoRA-trainable on a 24 GB L4 / 40 GB A100 (tight on a 16 GB T4).
+  Requires transformers >= 4.51. Use the post-trained Qwen/Qwen3-4B (not -Base) only if
+  skipping continued pretraining.

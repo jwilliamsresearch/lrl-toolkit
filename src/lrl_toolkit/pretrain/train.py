@@ -234,7 +234,16 @@ def run_pretraining(
             )
             model = get_peft_model(model, lora)
 
-    blocks = _pack_blocks(_corpus_texts(corpus_dir), tokenizer, seq_len, max_blocks=None)
+    # Only pack as many blocks as the run will actually consume. Packing is a
+    # single-threaded tokenization pass over the whole corpus, which can take hours
+    # on a large corpus — yet a `max_steps`-capped run needs only a small slice. When
+    # a step cap is set, stop after steps x effective-batch blocks (plus one batch of
+    # headroom); otherwise (epoch-based runs) pack the full corpus as before.
+    max_blocks = None
+    if max_steps:
+        blocks_per_step = compute.per_device_batch_size * compute.gradient_accumulation_steps
+        max_blocks = max_steps * blocks_per_step + blocks_per_step
+    blocks = _pack_blocks(_corpus_texts(corpus_dir), tokenizer, seq_len, max_blocks=max_blocks)
     if not blocks:
         raise RuntimeError("No training blocks produced; corpus too small for the seq_len.")
     dataset = _BlockDataset(blocks)

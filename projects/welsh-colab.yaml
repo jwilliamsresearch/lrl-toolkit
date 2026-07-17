@@ -53,7 +53,7 @@ convdata:
   # GENUINE instruction pairs — real datasets translated into Welsh.
   # No `synth:` block => no teacher LLM runs (no Ollama / no mock generation).
   translate: [dolly, oasst1]
-  translate_limit: 3000        # examples per dataset
+  translate_limit: 5000        # examples per dataset — more SFT data is the top quality lever for Welsh
   translate_backend: m2m100    # MIT — permissive, keeps the model releasable. Swap to `nllb` for best quality (non-commercial).
   provider: mock               # unused here (only the `teacher` backend would use it)
   review: false                # unattended run: skip the human-review gate
