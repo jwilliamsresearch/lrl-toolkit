@@ -1,87 +1,144 @@
 ---
-const groups = [
-  {
-    label: 'Celtic',
-    langs: [
-      { g: 'ŵ', n: 'Welsh' }, { g: 'á', n: 'Irish' }, { g: 'à', n: 'Scottish Gaelic' },
-      { g: 'ñ', n: 'Breton' }, { g: 'ᴋ', n: 'Cornish' },
-    ],
-  },
-  {
-    label: 'African',
-    langs: [
-      { g: 'ki', n: 'Swahili' }, { g: 'ọ', n: 'Yoruba' }, { g: 'ɗ', n: 'Hausa' },
-      { g: 'አ', n: 'Amharic' }, { g: 'ɓ', n: 'Zulu' }, { g: 'x', n: 'Xhosa' },
-    ],
-  },
-  {
-    label: 'Asian',
-    langs: [
-      { g: 'ئ', n: 'Uyghur' }, { g: 'ཀ', n: 'Tibetan' }, { g: 'پ', n: 'Pashto' },
-      { g: 'क', n: 'Nepali' }, { g: 'ក', n: 'Khmer' }, { g: 'ᠮ', n: 'Mongolian' },
-    ],
-  },
-  {
-    label: 'Kurdish',
-    langs: [
-      { g: 'ç', n: 'Kurmanji' }, { g: 'ک', n: 'Sorani' },
-    ],
-  },
-];
+import langData from '../data/languages.json';
+
+// Group all built-in languages by writing system (a first-class axis in the
+// toolkit), so the grouping is consistent and shows every language.
+const scriptOrder = ['Latin', 'Arabic', 'Cyrillic', 'Devanagari', 'Ethiopic', 'Sinhala', 'Tibetan', 'Khmer'];
+const byScript: Record<string, typeof langData> = {};
+for (const l of langData) (byScript[l.script] ??= []).push(l);
+const groups = scriptOrder
+  .filter((s) => byScript[s])
+  .map((s) => ({ script: s, langs: byScript[s].slice().sort((a, b) => a.name.localeCompare(b.name)) }));
 
 const models = [
-  'Qwen2.5 · 0.5–7B', 'Llama 3.1', 'Llama 3.2', 'Gemma 2', 'Mistral',
-  'Phi-3.5', 'Aya-23', 'Aya-Expanse', 'BLOOMZ', 'SmolLM2', 'TinyLlama', 'XLM-R',
+  'Qwen3 · 1.7B / 4B', 'Qwen2.5 · 0.5–7B', 'Llama 3.1', 'Llama 3.2', 'Gemma 2',
+  'Mistral', 'Phi-3.5', 'Aya-23', 'Aya-Expanse', 'BLOOMZ', 'SmolLM2', 'TinyLlama', 'XLM-R',
 ];
-
 const connectors = [
-  'Wikipedia', 'Glot500', 'CulturaX', 'MADLAD-400', 'OSCAR',
-  'Common Crawl', 'OPUS / NLLB', 'SMOL', 'local',
+  'Wikipedia', 'FineWeb-2', 'Glot500', 'CulturaX', 'MADLAD-400',
+  'OSCAR', 'Common Crawl', 'OPUS / NLLB', 'SMOL', 'local',
 ];
+const benchmarks = ['native cloze', 'perplexity', 'Belebele', 'Global-MMLU', 'FLORES chrF', 'LLM judge'];
+const backends = ['NLLB', 'M2M-100', 'OPUS-MT', 'MADLAD', 'teacher LLM', 'mock'];
 ---
 <section class="section" id="languages">
   <div class="wrap">
     <div class="section-head reveal">
       <span class="eyebrow">Not just the presets</span>
-      <h2>Any language. Any base model.</h2>
-      <p>The toolkit works for <b>any</b> low-resource language on <b>any</b> multilingual base — point it at any Hugging Face model. To make that easy, <b>33 languages</b> and <b>19 base models</b> ship built-in with script &amp; dialect metadata, NLLB codes, and source catalogs. Add your own by dropping a YAML in <code style="font-family:var(--font-mono);color:var(--accent)">configs/</code>.</p>
+      <h2>A language is a YAML file.</h2>
+      <p>The <b>33 languages</b> below ship built-in, but they aren't a fixed list; they're just the configs written so far. Adding one is a single YAML: an ISO code, its script, normalization rules. From that, <b>FineWeb-2</b> web text wires itself in automatically (33/33 covered), and <b>Aya</b> native instruction data too where it exists. Pick one to see what the toolkit resolves for it.</p>
     </div>
 
-    <div class="langs-grid">
-      <div class="lang-card reveal">
-        <h3>Built-in languages <span class="badge">33 · or any</span></h3>
+    <div class="planner reveal">
+      <div class="planner-pick">
         {groups.map((grp) => (
           <div class="lang-group">
-            <div class="gl">{grp.label}</div>
+            <div class="gl">{grp.script} <span class="gl-n">{grp.langs.length}</span></div>
             <div class="chips">
               {grp.langs.map((l) => (
-                <span class="chip"><span class="glyph">{l.g}</span>{l.n}</span>
+                <button class="chip lang-chip" type="button" data-slug={l.slug}>{l.name}</button>
               ))}
             </div>
           </div>
         ))}
-        <div class="lang-group">
-          <div class="chips">
-            <span class="chip more">+ Farsi, Somali, Sinhala, Occitan, Maltese, Quechua &amp; more</span>
-          </div>
+      </div>
+      <aside class="planner-panel" id="planner-panel" aria-live="polite"></aside>
+    </div>
+
+    <div class="langs-grid batteries">
+      <div class="lang-card reveal">
+        <h3>Base models <span class="badge">21 · or any</span></h3>
+        <div class="chips">
+          {models.map((m) => <span class="chip">{m}</span>)}
+          <span class="chip more">…or any multilingual HF model</span>
         </div>
       </div>
-
-      <div style="display:flex;flex-direction:column;gap:22px">
-        <div class="lang-card reveal">
-          <h3>Base models <span class="badge">19 · or any</span></h3>
-          <div class="chips">
-            {models.map((m) => <span class="chip">{m}</span>)}
-            <span class="chip more">…or any multilingual HF model</span>
-          </div>
-        </div>
-        <div class="lang-card reveal">
-          <h3>Data connectors <span class="badge">9</span></h3>
-          <div class="chips">
-            {connectors.map((c) => <span class="chip">{c}</span>)}
-          </div>
-        </div>
+      <div class="lang-card reveal">
+        <h3>Data connectors <span class="badge">10</span></h3>
+        <div class="chips">{connectors.map((c) => <span class="chip">{c}</span>)}</div>
+      </div>
+      <div class="lang-card reveal">
+        <h3>Evaluation benchmarks <span class="badge">6 · coverage-aware</span></h3>
+        <div class="chips">{benchmarks.map((b) => <span class="chip">{b}</span>)}</div>
+      </div>
+      <div class="lang-card reveal">
+        <h3>Translation backends <span class="badge">6</span></h3>
+        <div class="chips">{backends.map((b) => <span class="chip">{b}</span>)}</div>
       </div>
     </div>
   </div>
 </section>
+
+<script is:inline type="application/json" id="lang-data" set:html={JSON.stringify(langData)}></script>
+
+<script>
+  type Bench = { available: boolean; code: string | null };
+  type Lang = {
+    slug: string; name: string; iso: string; iso1: string | null; script: string;
+    dir: string; fineweb: string | null; aya: string | null;
+    benchmarks: Record<string, Bench>;
+  };
+
+  const el = document.getElementById('lang-data');
+  const DATA: Lang[] = el ? JSON.parse(el.textContent || '[]') : [];
+  const byslug = new Map(DATA.map((l) => [l.slug, l]));
+  const panel = document.getElementById('planner-panel');
+  const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('.lang-chip'));
+
+  const yes = '<span class="ok">✓</span>';
+  const no = '<span class="nope">—</span>';
+
+  function row(label: string, value: string) {
+    return `<div class="pr"><span class="pr-k">${label}</span><span class="pr-v">${value}</span></div>`;
+  }
+
+  function render(l: Lang) {
+    const b = l.benchmarks;
+    const covered = ['belebele', 'global_mmlu'].filter((k) => b[k]?.available).length;
+    const aya = l.aya
+      ? `${yes} Aya <code>${l.aya}</code>`
+      : `${no} none (uses translate + synth)`;
+    const bench = [
+      `native cloze ${yes}`,
+      `perplexity ${yes}`,
+      `Belebele ${b.belebele?.available ? yes : no}`,
+      `Global-MMLU ${b.global_mmlu?.available ? yes : no}`,
+      `FLORES ${b.flores?.available ? yes : '<span class="nope">gated</span>'}`,
+    ].join(' · ');
+
+    const yaml =
+      `# configs/languages/${l.slug}.yaml\n` +
+      `display_name: ${l.name}\n` +
+      `iso639_3: ${l.iso}\n` +
+      `scripts: [${l.script}]\n` +
+      `default_script: ${l.script}` +
+      (l.dir === 'rtl' ? '\ndirection: rtl' : '');
+
+    panel!.innerHTML = `
+      <div class="pp-head">
+        <div>
+          <h3>${l.name}</h3>
+          <div class="pp-sub"><code>${l.iso}</code> · ${l.script} · ${l.dir.toUpperCase()}</div>
+        </div>
+        <div class="pp-tag">${covered + 2}/6 benchmarks</div>
+      </div>
+      ${row('Pretraining corpus', `${yes} FineWeb-2 <code>${l.fineweb ?? '—'}</code> <span class="dimtxt">+ profile catalog (Wikipedia, CulturaX, MADLAD-400…)</span>`)}
+      ${row('Native instructions', aya)}
+      ${row('Benchmark coverage', bench)}
+      ${row('Suggested base', '<code>qwen3-1.7b</code> · QLoRA 4-bit')}
+      <pre class="pp-yaml"><code>${yaml}</code></pre>
+    `;
+  }
+
+  chips.forEach((c) => {
+    c.addEventListener('click', () => {
+      chips.forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
+      const l = byslug.get(c.dataset.slug || '');
+      if (l) render(l);
+    });
+  });
+
+  // Pre-select Kurmanji (or the first language) so the panel is never empty.
+  const initial = chips.find((c) => c.dataset.slug === 'kurmanji') || chips[0];
+  if (initial) initial.click();
+</script>

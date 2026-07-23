@@ -6,7 +6,15 @@ Take a language from *"here is an ISO code"* to *"here is a fine-tuned, evaluate
 
 Built for the messy reality of LRLs — Kurmanji/Sorani Kurdish, Welsh, Cornish, Farsi, and beyond — where corpora are scattered, scripts and dialects vary, and instruction data barely exists.
 
-> **Status:** Alpha (M5). **The full pipeline runs end-to-end** — ingest → clean → tokenizer → pretrain → convdata → finetune → evaluate → export — plus a **Streamlit dashboard**, **33 built-in languages**, and **19 base models**. Verified on live data (Welsh, SmolLM2, Ollama/NLLB). See [the roadmap](#roadmap).
+> **Status:** Alpha. **The full pipeline runs end-to-end** — ingest → clean → tokenizer → pretrain → convdata → finetune → evaluate → export — plus a coverage-aware evaluation harness, a **Streamlit dashboard**, **33 built-in languages**, and **21 base models** (incl. Qwen3). Verified on live data (Welsh, Kurmanji, Qwen3/SmolLM2, NLLB). See [the roadmap](#roadmap).
+
+---
+
+## Try it on Colab
+
+Train a **Welsh chat model end to end on a free Colab GPU** in ~2 hours. It saves everything to your Google Drive and resumes if the runtime disconnects:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jwilliamsresearch/lrl-toolkit/blob/main/examples/lrl_colab.ipynb)
 
 ---
 

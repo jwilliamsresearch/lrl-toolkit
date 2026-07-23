@@ -1,0 +1,860 @@
+[
+  {
+    "slug": "amharic",
+    "name": "Amharic",
+    "iso": "amh",
+    "iso1": "am",
+    "script": "Ethiopic",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "amh_Ethi",
+    "fineweb": "amh_Ethi",
+    "aya": "amh",
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "amh_Ethi"
+      },
+      "global_mmlu": {
+        "available": true,
+        "code": "am"
+      },
+      "flores": {
+        "available": false,
+        "code": "amh_Ethi"
+      }
+    }
+  },
+  {
+    "slug": "basque",
+    "name": "Basque",
+    "iso": "eus",
+    "iso1": "eu",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "eus_Latn",
+    "fineweb": "eus_Latn",
+    "aya": "eus",
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "eus_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "eu"
+      },
+      "flores": {
+        "available": false,
+        "code": "eus_Latn"
+      }
+    }
+  },
+  {
+    "slug": "breton",
+    "name": "Breton",
+    "iso": "bre",
+    "iso1": "br",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": null,
+    "fineweb": "bre_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "bre_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "br"
+      },
+      "flores": {
+        "available": false,
+        "code": "bre_Latn"
+      }
+    }
+  },
+  {
+    "slug": "cornish",
+    "name": "Cornish",
+    "iso": "cor",
+    "iso1": "kw",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Celtic (Brythonic)",
+    "nllb": null,
+    "fineweb": "cor_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "cor_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "kw"
+      },
+      "flores": {
+        "available": false,
+        "code": "cor_Latn"
+      }
+    }
+  },
+  {
+    "slug": "faroese",
+    "name": "Faroese",
+    "iso": "fao",
+    "iso1": "fo",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "fao_Latn",
+    "fineweb": "fao_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "fao_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "fo"
+      },
+      "flores": {
+        "available": false,
+        "code": "fao_Latn"
+      }
+    }
+  },
+  {
+    "slug": "farsi",
+    "name": "Persian (Farsi)",
+    "iso": "fas",
+    "iso1": "fa",
+    "script": "Arabic",
+    "dir": "rtl",
+    "family": "Iranian (Southwestern)",
+    "nllb": "pes_Arab",
+    "fineweb": "fas_Arab",
+    "aya": "pes",
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "fas_Arab"
+      },
+      "global_mmlu": {
+        "available": true,
+        "code": "fa"
+      },
+      "flores": {
+        "available": false,
+        "code": "pes_Arab"
+      }
+    }
+  },
+  {
+    "slug": "galician",
+    "name": "Galician",
+    "iso": "glg",
+    "iso1": "gl",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "glg_Latn",
+    "fineweb": "glg_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "glg_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "gl"
+      },
+      "flores": {
+        "available": false,
+        "code": "glg_Latn"
+      }
+    }
+  },
+  {
+    "slug": "guarani",
+    "name": "Guarani",
+    "iso": "grn",
+    "iso1": "gn",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "grn_Latn",
+    "fineweb": "gug_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "grn_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "gn"
+      },
+      "flores": {
+        "available": false,
+        "code": "grn_Latn"
+      }
+    }
+  },
+  {
+    "slug": "haitian_creole",
+    "name": "Haitian Creole",
+    "iso": "hat",
+    "iso1": "ht",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "hat_Latn",
+    "fineweb": "hat_Latn",
+    "aya": "hat",
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "hat_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "ht"
+      },
+      "flores": {
+        "available": false,
+        "code": "hat_Latn"
+      }
+    }
+  },
+  {
+    "slug": "hausa",
+    "name": "Hausa",
+    "iso": "hau",
+    "iso1": "ha",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "hau_Latn",
+    "fineweb": "hau_Latn",
+    "aya": "hau",
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "hau_Latn"
+      },
+      "global_mmlu": {
+        "available": true,
+        "code": "ha"
+      },
+      "flores": {
+        "available": false,
+        "code": "hau_Latn"
+      }
+    }
+  },
+  {
+    "slug": "igbo",
+    "name": "Igbo",
+    "iso": "ibo",
+    "iso1": "ig",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "ibo_Latn",
+    "fineweb": "ibo_Latn",
+    "aya": "ibo",
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "ibo_Latn"
+      },
+      "global_mmlu": {
+        "available": true,
+        "code": "ig"
+      },
+      "flores": {
+        "available": false,
+        "code": "ibo_Latn"
+      }
+    }
+  },
+  {
+    "slug": "irish",
+    "name": "Irish",
+    "iso": "gle",
+    "iso1": "ga",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "gle_Latn",
+    "fineweb": "gle_Latn",
+    "aya": "gle",
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "gle_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "ga"
+      },
+      "flores": {
+        "available": false,
+        "code": "gle_Latn"
+      }
+    }
+  },
+  {
+    "slug": "khmer",
+    "name": "Khmer",
+    "iso": "khm",
+    "iso1": "km",
+    "script": "Khmer",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "khm_Khmr",
+    "fineweb": "khm_Khmr",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "khm_Khmr"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "km"
+      },
+      "flores": {
+        "available": false,
+        "code": "khm_Khmr"
+      }
+    }
+  },
+  {
+    "slug": "kurmanji",
+    "name": "Kurmanji Kurdish",
+    "iso": "kmr",
+    "iso1": "ku",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Iranian (Northwestern)",
+    "nllb": "kmr_Latn",
+    "fineweb": "kmr_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "kmr_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "ku"
+      },
+      "flores": {
+        "available": false,
+        "code": "kmr_Latn"
+      }
+    }
+  },
+  {
+    "slug": "luxembourgish",
+    "name": "Luxembourgish",
+    "iso": "ltz",
+    "iso1": "lb",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "ltz_Latn",
+    "fineweb": "ltz_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "ltz_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "lb"
+      },
+      "flores": {
+        "available": false,
+        "code": "ltz_Latn"
+      }
+    }
+  },
+  {
+    "slug": "maltese",
+    "name": "Maltese",
+    "iso": "mlt",
+    "iso1": "mt",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "mlt_Latn",
+    "fineweb": "mlt_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "mlt_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "mt"
+      },
+      "flores": {
+        "available": false,
+        "code": "mlt_Latn"
+      }
+    }
+  },
+  {
+    "slug": "maori",
+    "name": "Maori",
+    "iso": "mri",
+    "iso1": "mi",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "mri_Latn",
+    "fineweb": "mri_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "mri_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "mi"
+      },
+      "flores": {
+        "available": false,
+        "code": "mri_Latn"
+      }
+    }
+  },
+  {
+    "slug": "mongolian",
+    "name": "Mongolian",
+    "iso": "mon",
+    "iso1": "mn",
+    "script": "Cyrillic",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "khk_Cyrl",
+    "fineweb": "khk_Cyrl",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "mon_Cyrl"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "mn"
+      },
+      "flores": {
+        "available": false,
+        "code": "khk_Cyrl"
+      }
+    }
+  },
+  {
+    "slug": "nepali",
+    "name": "Nepali",
+    "iso": "nep",
+    "iso1": "ne",
+    "script": "Devanagari",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "npi_Deva",
+    "fineweb": "npi_Deva",
+    "aya": "npi",
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "nep_Deva"
+      },
+      "global_mmlu": {
+        "available": true,
+        "code": "ne"
+      },
+      "flores": {
+        "available": false,
+        "code": "npi_Deva"
+      }
+    }
+  },
+  {
+    "slug": "occitan",
+    "name": "Occitan",
+    "iso": "oci",
+    "iso1": "oc",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "oci_Latn",
+    "fineweb": "oci_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "oci_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "oc"
+      },
+      "flores": {
+        "available": false,
+        "code": "oci_Latn"
+      }
+    }
+  },
+  {
+    "slug": "pashto",
+    "name": "Pashto",
+    "iso": "pus",
+    "iso1": "ps",
+    "script": "Arabic",
+    "dir": "rtl",
+    "family": "Other",
+    "nllb": "pbt_Arab",
+    "fineweb": "pbt_Arab",
+    "aya": "pbt",
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "pus_Arab"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "ps"
+      },
+      "flores": {
+        "available": false,
+        "code": "pbt_Arab"
+      }
+    }
+  },
+  {
+    "slug": "quechua",
+    "name": "Quechua",
+    "iso": "que",
+    "iso1": "qu",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "quy_Latn",
+    "fineweb": "quy_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "que_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "qu"
+      },
+      "flores": {
+        "available": false,
+        "code": "quy_Latn"
+      }
+    }
+  },
+  {
+    "slug": "scottish_gaelic",
+    "name": "Scottish Gaelic",
+    "iso": "gla",
+    "iso1": "gd",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "gla_Latn",
+    "fineweb": "gla_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "gla_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "gd"
+      },
+      "flores": {
+        "available": false,
+        "code": "gla_Latn"
+      }
+    }
+  },
+  {
+    "slug": "sinhala",
+    "name": "Sinhala",
+    "iso": "sin",
+    "iso1": "si",
+    "script": "Sinhala",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "sin_Sinh",
+    "fineweb": "sin_Sinh",
+    "aya": "sin",
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "sin_Sinh"
+      },
+      "global_mmlu": {
+        "available": true,
+        "code": "si"
+      },
+      "flores": {
+        "available": false,
+        "code": "sin_Sinh"
+      }
+    }
+  },
+  {
+    "slug": "somali",
+    "name": "Somali",
+    "iso": "som",
+    "iso1": "so",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "som_Latn",
+    "fineweb": "som_Latn",
+    "aya": "som",
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "som_Latn"
+      },
+      "global_mmlu": {
+        "available": true,
+        "code": "so"
+      },
+      "flores": {
+        "available": false,
+        "code": "som_Latn"
+      }
+    }
+  },
+  {
+    "slug": "sorani",
+    "name": "Sorani Kurdish",
+    "iso": "ckb",
+    "iso1": null,
+    "script": "Arabic",
+    "dir": "rtl",
+    "family": "Iranian (Northwestern)",
+    "nllb": "ckb_Arab",
+    "fineweb": "ckb_Arab",
+    "aya": "ckb",
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "ckb_Arab"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": null
+      },
+      "flores": {
+        "available": false,
+        "code": "ckb_Arab"
+      }
+    }
+  },
+  {
+    "slug": "swahili",
+    "name": "Swahili",
+    "iso": "swa",
+    "iso1": "sw",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "swh_Latn",
+    "fineweb": "swh_Latn",
+    "aya": "swh",
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "swa_Latn"
+      },
+      "global_mmlu": {
+        "available": true,
+        "code": "sw"
+      },
+      "flores": {
+        "available": false,
+        "code": "swh_Latn"
+      }
+    }
+  },
+  {
+    "slug": "tibetan",
+    "name": "Tibetan",
+    "iso": "bod",
+    "iso1": "bo",
+    "script": "Tibetan",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "bod_Tibt",
+    "fineweb": "bod_Tibt",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "bod_Tibt"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "bo"
+      },
+      "flores": {
+        "available": false,
+        "code": "bod_Tibt"
+      }
+    }
+  },
+  {
+    "slug": "uyghur",
+    "name": "Uyghur",
+    "iso": "uig",
+    "iso1": "ug",
+    "script": "Arabic",
+    "dir": "rtl",
+    "family": "Other",
+    "nllb": "uig_Arab",
+    "fineweb": "uig_Arab",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "uig_Arab"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "ug"
+      },
+      "flores": {
+        "available": false,
+        "code": "uig_Arab"
+      }
+    }
+  },
+  {
+    "slug": "welsh",
+    "name": "Welsh",
+    "iso": "cym",
+    "iso1": "cy",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Celtic (Brythonic)",
+    "nllb": "cym_Latn",
+    "fineweb": "cym_Latn",
+    "aya": null,
+    "benchmarks": {
+      "belebele": {
+        "available": false,
+        "code": "cym_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "cy"
+      },
+      "flores": {
+        "available": false,
+        "code": "cym_Latn"
+      }
+    }
+  },
+  {
+    "slug": "xhosa",
+    "name": "Xhosa",
+    "iso": "xho",
+    "iso1": "xh",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "xho_Latn",
+    "fineweb": "xho_Latn",
+    "aya": "xho",
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "xho_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "xh"
+      },
+      "flores": {
+        "available": false,
+        "code": "xho_Latn"
+      }
+    }
+  },
+  {
+    "slug": "yoruba",
+    "name": "Yoruba",
+    "iso": "yor",
+    "iso1": "yo",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "yor_Latn",
+    "fineweb": "yor_Latn",
+    "aya": "yor",
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "yor_Latn"
+      },
+      "global_mmlu": {
+        "available": true,
+        "code": "yo"
+      },
+      "flores": {
+        "available": false,
+        "code": "yor_Latn"
+      }
+    }
+  },
+  {
+    "slug": "zulu",
+    "name": "Zulu",
+    "iso": "zul",
+    "iso1": "zu",
+    "script": "Latin",
+    "dir": "ltr",
+    "family": "Other",
+    "nllb": "zul_Latn",
+    "fineweb": "zul_Latn",
+    "aya": "zul",
+    "benchmarks": {
+      "belebele": {
+        "available": true,
+        "code": "zul_Latn"
+      },
+      "global_mmlu": {
+        "available": false,
+        "code": "zu"
+      },
+      "flores": {
+        "available": false,
+        "code": "zul_Latn"
+      }
+    }
+  }
+]

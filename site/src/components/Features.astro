@@ -2,28 +2,38 @@
 const features = [
   {
     title: 'Config over code',
-    body: 'One YAML per language project. Every stage reads the same validated config, writes a manifest, and is fully resumable — re-run a stage without redoing the rest.',
+    body: 'One YAML per language project. Every stage reads the same validated config, writes a manifest, and is fully resumable. Re-run a stage without redoing the rest.',
     icon: '<path d="M4 5h16M4 12h10M4 19h16" stroke-linecap="round"/>',
   },
   {
+    title: 'A language is a YAML',
+    body: 'Adding a language is a config file: an ISO code, its script, and normalization rules. From that, <b>FineWeb-2</b> web text wires itself in automatically, and <b>Aya</b> native instruction data too where it exists, with no per-language plumbing. Current or future, every language gets it.',
+    icon: '<path d="M7 3h8l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke-linejoin="round"/><path d="M14 3v5h5" stroke-linejoin="round"/><path d="M12 11v6M9 14h6" stroke-linecap="round"/>',
+  },
+  {
     title: 'Adapt, don\'t pretrain',
-    body: 'Continued pretraining + tokenizer extension + instruction tuning on a strong multilingual base — Llama, Qwen, Gemma, Aya, XLM-R. Best quality per dollar, no from-scratch runs.',
+    body: 'Continued pretraining + tokenizer extension + instruction tuning on a strong multilingual base: Llama, Qwen3, Gemma, Aya, XLM-R. Best quality per dollar, no from-scratch runs.',
     icon: '<path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5" stroke-linecap="round" stroke-linejoin="round"/>',
   },
   {
     title: 'Consumer-GPU first',
-    body: 'QLoRA / 4-bit defaults that run on Colab, Kaggle, or an 8&nbsp;GB card. Automatic QLoRA→LoRA→CPU fallback when there\'s no GPU. A100 and multi-GPU are alternate profiles.',
+    body: 'QLoRA / 4-bit defaults that run on Colab, Kaggle, or an 8&nbsp;GB card. Automatic QLoRA→LoRA→CPU fallback when there\'s no GPU. A100 profiles &amp; SLURM job arrays scale it to a cluster.',
     icon: '<rect x="4" y="7" width="16" height="10" rx="2"/><path d="M8 7V5M16 7V5M9 17v2M15 17v2" stroke-linecap="round"/>',
   },
   {
-    title: 'Provenance & ethics, first-class',
-    body: 'Every datum carries a license and source record. Export is <b>blocked</b> until all licenses resolve. A review queue puts native speakers in the loop before fine-tuning.',
+    title: 'Provenance, licensing & ethics',
+    body: 'Every datum carries a license and source record. Export is <b>blocked</b> until licenses resolve, then the release license is <b>computed automatically</b> (share-alike dominates permissive sources). Native-speaker review queues gate both data and model outputs.',
     icon: '<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>',
   },
   {
-    title: 'Conversational data, three ways',
-    body: 'Translate open instruction sets (NLLB, M2M-100, OPUS-MT, MADLAD), synthesize native pairs with a local teacher LLM, then review — all on open-weight models, no proprietary APIs.',
+    title: 'Conversational data, four ways',
+    body: 'Translate open instruction sets (NLLB, M2M-100, OPUS-MT, MADLAD), reuse <b>native instruction data</b> (Aya) as-is, synthesize with a local teacher, then review. All open-weight, no proprietary APIs, with FLORES-in-training safeguards.',
     icon: '<path d="M4 5h16v10H10l-4 4V5Z" stroke-linejoin="round"/><path d="M8 9h8M8 12h5" stroke-linecap="round"/>',
+  },
+  {
+    title: 'Evaluate honestly, everywhere',
+    body: 'A <b>coverage-aware</b> harness: every benchmark self-reports whether it covers the language, scores are <b>base-vs-adapted deltas</b> with bootstrap CIs, and a universal corpus-derived <b>native-cloze</b> metric covers the long tail that has no benchmarks at all.',
+    icon: '<path d="M4 19V5M4 19h16" stroke-linecap="round"/><rect x="7" y="11" width="3" height="5" rx="0.5"/><rect x="12" y="8" width="3" height="8" rx="0.5"/><rect x="17" y="13" width="3" height="3" rx="0.5"/>',
   },
   {
     title: 'Drive it from the dashboard',
@@ -37,7 +47,7 @@ const features = [
     <div class="section-head reveal">
       <span class="eyebrow">Why lrl-toolkit</span>
       <h2>Built for the messy reality of low-resource languages.</h2>
-      <p>Scattered corpora, varying scripts and dialects, and instruction data that barely exists — made into a managed, reproducible, one-config workflow.</p>
+      <p>Scattered corpora, varying scripts and dialects, and instruction data that barely exists, made into a managed, reproducible, one-config workflow.</p>
     </div>
 
     <div class="features">

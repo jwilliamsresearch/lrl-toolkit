@@ -1,0 +1,60 @@
+# lrl-toolkit example: Welsh (cy) — full 8-stage run, sized for a free Colab T4.
+#
+# Welsh is the reference language: well-resourced and in NLLB (cym_Latn), so the
+# WHOLE pipeline runs end to end — including convdata + finetune, which produce a
+# real Welsh chat model (not just an LM adaptation). Everything here is capped so
+# it finishes in a single Colab session (~1-1.5 h on a T4).
+#
+# The Colab notebook (welsh_colab.ipynb) writes its own copy of this config with
+# `workdir` pointed at Google Drive, so corpus, checkpoints, the trained model,
+# and the manifest all persist on Drive and the run resumes after a disconnect.
+name: welsh
+language: welsh
+base_model: qwen3-1.7b        # comfortable QLoRA fit on a 16 GB T4
+compute: consumer_gpu         # QLoRA 4-bit, gradient checkpointing
+
+ingest:
+  sources: [wikipedia, culturax, madlad400, fineweb2]   # cleanly-licensed only
+  max_gb: 0.25                 # Welsh has plenty; cap it so ingest + clean stay quick
+
+clean:
+  lang_id: glotlid
+  dedup: minhash
+  min_quality: 0.6
+
+tokenizer:
+  strategy: extend
+  added_tokens: 2000
+
+pretrain:
+  method: qlora
+  max_steps: 300              # ~40 min on a T4; raise for a stronger model
+  seq_len: 1024               # T4-friendly
+
+convdata:
+  translate: [dolly]          # open instruction set, translated En->Welsh
+  translate_limit: 200
+  translate_backend: nllb     # Welsh IS in NLLB-200 (cym_Latn)
+  provider: local             # no Ollama on Colab: a small on-GPU HF teacher
+  model: Qwen/Qwen2.5-1.5B-Instruct
+  synth:
+    provider: local
+    model: Qwen/Qwen2.5-1.5B-Instruct
+    n: 120
+  review: false               # unattended demo; real deployments should review
+
+finetune:
+  method: qlora
+  epochs: 1
+  max_seq_len: 1024
+
+evaluate:
+  # Coverage-aware: native_cloze + perplexity run; Belebele IS covered for Welsh
+  # (cym_Latn); Global-MMLU reports "not covered"; FLORES reports "gated".
+  benchmarks: [native_cloze, perplexity, belebele, global_mmlu, flores]
+  limit: 100
+
+export:
+  quantize: [gguf_q4_k_m]
+  make_ollama_modelfile: true
+  push_to_hub: false          # set true + hub_repo, and log in, to publish

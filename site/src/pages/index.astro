@@ -8,23 +8,27 @@ import Features from '../components/Features.astro';
 import Languages from '../components/Languages.astro';
 import Footer from '../components/Footer.astro';
 
-const title = 'lrl-toolkit — build a language model for any low-resource language';
+const title = 'lrl-toolkit: build a language model for any low-resource language';
 const description =
-  'A config-driven, open-source pipeline that takes a low-resource language from an ISO code to a fine-tuned, evaluated, publishable chat model — on a single consumer GPU.';
+  'A config-driven, open-source pipeline that takes a low-resource language from an ISO code to a fine-tuned, evaluated, publishable chat model, on a single consumer GPU.';
+const ogImage = new URL('logo.png', Astro.site ?? 'https://jwilliamsresearch.github.io/').href;
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="theme-color" content="#05080a" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImage} />
 
     <!-- no-flash theme init: runs before paint -->
     <script is:inline>

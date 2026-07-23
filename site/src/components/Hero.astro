@@ -1,9 +1,11 @@
 ---
-// Hero + morphing multilingual ASCII globe
+// Hero + animated WebGL galaxy whose "stars" are glyphs from world writing
+// systems (a spiral of characters). The previous flat ASCII-globe hero is
+// preserved in HeroGlobe.astro.
 ---
 <section class="hero">
   <div class="hero-canvas-wrap" aria-hidden="true">
-    <canvas id="ascii-canvas"></canvas>
+    <canvas id="galaxy-canvas"></canvas>
   </div>
 
   <div class="wrap hero-inner">
@@ -12,7 +14,7 @@
 
       <p class="sub">
         A config-driven, open-source pipeline that takes <b>any</b> low-resource
-        language — on <b>any</b> multilingual base model — from an ISO code to a
+        language, on <b>any</b> multilingual base model, from an ISO code to a
         fine-tuned, evaluated, publishable chat model on a single consumer GPU.
       </p>
 
@@ -39,193 +41,222 @@
 <section class="stats-section" id="stats">
   <div class="wrap">
     <div class="stats reveal">
-      <div class="stat"><div class="n">33</div><div class="l">languages</div></div>
-      <div class="stat"><div class="n">19</div><div class="l">base models</div></div>
-      <div class="stat"><div class="n">9</div><div class="l">data connectors</div></div>
+      <div class="stat"><div class="n">33</div><div class="l">languages built-in</div></div>
+      <div class="stat"><div class="n">21</div><div class="l">base models</div></div>
+      <div class="stat"><div class="n">10</div><div class="l">data connectors</div></div>
       <div class="stat"><div class="n">8</div><div class="l">pipeline stages</div></div>
-      <div class="stat"><div class="n">1</div><div class="l">YAML per project</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">YAML to add a language</div></div>
     </div>
   </div>
 </section>
 
 <script>
-  // ---- Morphing multilingual ASCII globe ------------------------------------
-  const canvas = document.getElementById('ascii-canvas') as HTMLCanvasElement | null;
+  import * as THREE from 'three';
+
+  const canvas = document.getElementById('galaxy-canvas') as HTMLCanvasElement | null;
   if (canvas) {
-    const ctx = canvas.getContext('2d')!;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Glyphs drawn from the scripts of supported languages.
+    // ---- glyph atlas: one texture holding characters from many scripts ------
     const GLYPHS = (
-      'lrltoolkitwŵŷâêîôûabcdefghij' +           // Latin / Welsh, Cornish
-      'اببپتثجچحخدذرڕزژسشعغفقکگلڵمنوۆهیێ' +      // Arabic — Kurdish, Farsi, Pashto, Uyghur
-      'ሀለሐመሠረሰሸቀበተኀነአከወዐዘየደገጠጰጸፀፈፐ' +          // Ge'ez — Amharic, Tigrinya
-      'ཀཁགངཅཆཇཉཏཐདནཔཕབམཙཚཛཝཞའཡརལཤསཧ' +          // Tibetan
-      'кбвгджзиклмнпрстфхцчшщ' +                  // Cyrillic — Mongolian, etc.
-      'कखगघचछजझटठडणतथदधनपफबभमयरलवशषसह' +          // Devanagari — Nepali
-      'កខគឃងចឆជឈញដឋឌធនបផពភមយរលវសហ'              // Khmer
+      'lrltoolkÿŵŷâêîôûçşñ' +               // Latin (Welsh, Kurdish, Cornish)
+      'ابپتجچحخدرزسشعفقکگلمنوهیێۆ' +        // Arabic (Kurdish, Farsi, Pashto, Uyghur)
+      'ሀለመረሰቀበተነአከወየደገ' +                  // Ge'ez (Amharic)
+      'ཀཁགངཅཇཏདནཔབམ' +                     // Tibetan
+      'бвгджзиклмнпрс' +                    // Cyrillic (Mongolian)
+      'कखगचजटतदनपबमयरलवशस' +                // Devanagari (Nepali)
+      'កខគងចជតនបពមយរលសហ' +                  // Khmer
+      '文语'                                // echo the logo
     ).split('');
+    const COLS = 8, ROWS = 8, CELL = 64;   // 64 cells, 512x512 atlas
+    const atlas = document.createElement('canvas');
+    atlas.width = COLS * CELL;
+    atlas.height = ROWS * CELL;
+    const actx = atlas.getContext('2d')!;
+    actx.fillStyle = '#fff';
+    actx.textAlign = 'center';
+    actx.textBaseline = 'middle';
+    actx.font = `${Math.floor(CELL * 0.66)}px "Noto Sans", ui-monospace, "JetBrains Mono", Menlo, sans-serif`;
+    const NGLYPH = COLS * ROWS;
+    for (let i = 0; i < NGLYPH; i++) {
+      const g = GLYPHS[i % GLYPHS.length];
+      const cx = (i % COLS) * CELL + CELL / 2;
+      const cy = ((i / COLS) | 0) * CELL + CELL / 2;
+      actx.fillText(g, cx, cy);
+    }
+    const atlasTex = new THREE.CanvasTexture(atlas);
+    atlasTex.flipY = false; // match canvas top-left origin to gl_PointCoord
+    atlasTex.minFilter = THREE.LinearFilter;
+    atlasTex.magFilter = THREE.LinearFilter;
 
-    // Fibonacci sphere point cloud.
-    const N = 1500;
-    const pts: number[][] = [];
-    const off = 2 / N;
-    const inc = Math.PI * (3 - Math.sqrt(5));
-    for (let i = 0; i < N; i++) {
-      const y = i * off - 1 + off / 2;
-      const r = Math.sqrt(Math.max(0, 1 - y * y));
-      const phi = i * inc;
-      pts.push([Math.cos(phi) * r, y, Math.sin(phi) * r]);
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+    } catch (e) {
+      throw e; // no WebGL: leave the canvas blank, page bg shows through
+    }
+    const PR = Math.min(2, window.devicePixelRatio || 1);
+    renderer.setPixelRatio(PR);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(58, 1, 0.1, 100);
+    camera.position.set(0, 2.75, 5.1);
+    camera.lookAt(0, 0, 0);
+
+    // ---- galaxy geometry: a spiral of glyph "stars" -------------------------
+    const RADIUS = 5, BRANCHES = 4, SPIN = 0.85, RANDOMNESS = 0.55, RAND_POW = 2.6;
+    const mobile = window.innerWidth < 760;
+    const COUNT = mobile ? 5200 : 11000;
+
+    const positions = new Float32Array(COUNT * 3);
+    const radii = new Float32Array(COUNT);
+    const aGlyph = new Float32Array(COUNT);
+    const aScale = new Float32Array(COUNT);
+    for (let i = 0; i < COUNT; i++) {
+      const i3 = i * 3;
+      const radius = Math.pow(Math.random(), 1.5) * RADIUS;
+      radii[i] = radius;
+      const branch = ((i % BRANCHES) / BRANCHES) * Math.PI * 2;
+      const spin = radius * SPIN;
+      const rp = () => Math.pow(Math.random(), RAND_POW) * (Math.random() < 0.5 ? 1 : -1) * RANDOMNESS * radius;
+      positions[i3] = Math.cos(branch + spin) * radius + rp();
+      positions[i3 + 1] = rp() * 0.45;
+      positions[i3 + 2] = Math.sin(branch + spin) * radius + rp();
+      aGlyph[i] = (Math.random() * NGLYPH) | 0;
+      aScale[i] = 0.55 + Math.random() * 0.9;
     }
 
-    let W = 0, H = 0, dpr = 1;
-    let cellW = 8, cellH = 12, cols = 0, rows = 0, fontPx = 13;
-    let glyph: Int16Array = new Int16Array(0);
-    let swapAt: Float32Array = new Float32Array(0);
-    let noise: Float32Array = new Float32Array(0);
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('aColor', new THREE.BufferAttribute(new Float32Array(COUNT * 3), 3));
+    const glyphAttr = new THREE.BufferAttribute(aGlyph, 1);
+    geometry.setAttribute('aGlyph', glyphAttr);
+    geometry.setAttribute('aScale', new THREE.BufferAttribute(aScale, 1));
 
-    function resize() {
-      const rect = canvas!.getBoundingClientRect();
-      W = Math.max(1, rect.width);
-      H = Math.max(1, rect.height);
-      dpr = Math.min(2, window.devicePixelRatio || 1);
-      canvas!.width = Math.floor(W * dpr);
-      canvas!.height = Math.floor(H * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const material = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uAtlas: { value: atlasTex },
+        uCols: { value: COLS },
+        uRows: { value: ROWS },
+        uSize: { value: 78 * PR },
+        uOpacity: { value: 1 },
+      },
+      vertexShader: `
+        attribute float aGlyph;
+        attribute float aScale;
+        attribute vec3 aColor;
+        varying vec3 vColor;
+        varying float vGlyph;
+        uniform float uSize;
+        void main() {
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          gl_Position = projectionMatrix * mv;
+          gl_PointSize = uSize * aScale / max(0.1, -mv.z);
+          vColor = aColor;
+          vGlyph = aGlyph;
+        }`,
+      fragmentShader: `
+        precision mediump float;
+        uniform sampler2D uAtlas;
+        uniform float uCols, uRows, uOpacity;
+        varying vec3 vColor;
+        varying float vGlyph;
+        void main() {
+          vec2 cell = vec2(mod(vGlyph, uCols), floor(vGlyph / uCols));
+          vec2 uv = (cell + gl_PointCoord) / vec2(uCols, uRows);
+          float a = texture2D(uAtlas, uv).a * uOpacity;
+          if (a < 0.03) discard;
+          gl_FragColor = vec4(vColor, a);
+        }`,
+    });
 
-      fontPx = Math.max(10, Math.min(15, W / 88));
-      cellW = fontPx * 0.66;
-      cellH = fontPx * 1.02;
-      cols = Math.max(1, Math.floor(W / cellW));
-      rows = Math.max(1, Math.floor(H / cellH));
-
-      const total = cols * rows;
-      glyph = new Int16Array(total);
-      swapAt = new Float32Array(total);
-      noise = new Float32Array(total);
-      for (let i = 0; i < total; i++) {
-        glyph[i] = (Math.random() * GLYPHS.length) | 0;
-        swapAt[i] = Math.random() * 2000;
-        // stable sparse background noise
-        const n = Math.sin(i * 12.9898) * 43758.5453;
-        noise[i] = n - Math.floor(n);
-      }
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.font = `${fontPx}px ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace`;
-    }
-
-    // theme-aware colours: [dim rgb, accent rgb]
-    function palette(): [number[], number[]] {
+    // Theme-reactive colours: additive teal→indigo glow on dark; saturated,
+    // normally-blended colours that read on a light background.
+    function applyTheme() {
       const light = document.documentElement.getAttribute('data-theme') === 'light';
-      return light
-        ? [[123, 145, 140], [13, 148, 136]]
-        : [[120, 145, 141], [45, 212, 191]];
+      const inside = new THREE.Color(light ? '#0d9488' : '#d3fff5');
+      const outside = new THREE.Color(light ? '#4338ca' : '#4326c0');
+      const col = geometry.getAttribute('aColor') as THREE.BufferAttribute;
+      const tmp = new THREE.Color();
+      for (let i = 0; i < COUNT; i++) {
+        tmp.copy(inside).lerp(outside, Math.min(1, radii[i] / RADIUS));
+        col.setXYZ(i, tmp.r, tmp.g, tmp.b);
+      }
+      col.needsUpdate = true;
+      material.blending = light ? THREE.NormalBlending : THREE.AdditiveBlending;
+      material.uniforms.uOpacity.value = light ? 0.9 : 1;
+    }
+    applyTheme();
+
+    const spinner = new THREE.Points(geometry, material);
+    const galaxy = new THREE.Group();
+    galaxy.add(spinner);
+    galaxy.rotation.x = 0.18;
+    scene.add(galaxy);
+
+    function layout() {
+      const rect = canvas!.getBoundingClientRect();
+      const w = Math.max(1, rect.width), h = Math.max(1, rect.height);
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      galaxy.position.x = w < 760 ? 0 : 1.5;
+    }
+    layout();
+
+    // gentle pointer parallax
+    let px = 0, py = 0, tx = 0, ty = 0;
+    if (!reduce) {
+      window.addEventListener('pointermove', (e) => {
+        tx = (e.clientX / window.innerWidth - 0.5) * 0.5;
+        ty = (e.clientY / window.innerHeight - 0.5) * 0.35;
+      }, { passive: true });
     }
 
-    function draw(t: number) {
-      ctx.clearRect(0, 0, W, H);
-      ctx.font = `${fontPx}px ui-monospace, "JetBrains Mono", Menlo, Consolas, monospace`;
-      const [dim, acc] = palette();
-
-      // rotate the sphere; project to a cell-intensity buffer
-      const ay = reduce ? 0.6 : t * 0.00022;
-      const ax = -0.42;
-      const cay = Math.cos(ay), say = Math.sin(ay);
-      const cax = Math.cos(ax), sax = Math.sin(ax);
-      // globe sits right-of-centre on wide screens (text overlaps its left
-      // fringe); centred on narrow screens.
-      const mobile = W < 760;
-      const cxp = mobile ? W * 0.5 : W * 0.66;
-      const cyp = H * 0.48;
-      const Rpx = Math.min(mobile ? W * 0.44 : W * 0.32, H * 0.42);
-      const inten = new Float32Array(cols * rows); // 0 = none
-
-      for (let i = 0; i < N; i++) {
-        const p = pts[i];
-        // rotate X then Y
-        let y = p[1] * cax - p[2] * sax;
-        let z = p[1] * sax + p[2] * cax;
-        let x = p[0] * cay + z * say;
-        z = -p[0] * say + z * cay;
-        if (z < 0) continue; // back hemisphere
-        const sx = cxp + x * Rpx;
-        const sy = cyp + y * Rpx;
-        const c = (sx / cellW) | 0;
-        const r = (sy / cellH) | 0;
-        if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
-        const idx = r * cols + c;
-        const v = 0.55 + 0.45 * z;
-        if (v > inten[idx]) inten[idx] = v;
+    // occasionally re-roll a few glyphs so the field subtly shimmers/morphs
+    let morphTick = 0;
+    function morph() {
+      for (let k = 0; k < 40; k++) {
+        aGlyph[(Math.random() * COUNT) | 0] = (Math.random() * NGLYPH) | 0;
       }
-
-      const now = t;
-      for (let idx = 0; idx < cols * rows; idx++) {
-        let v = inten[idx];
-        const isGlobe = v > 0;
-        if (!isGlobe) {
-          if (noise[idx] > 0.9) v = 0.12 + noise[idx] * 0.06; // sparse ambient
-          else continue;
-        }
-        // morph the glyph on a per-cell timer (globe cells morph faster)
-        if (now > swapAt[idx]) {
-          glyph[idx] = (Math.random() * GLYPHS.length) | 0;
-          swapAt[idx] = now + (isGlobe ? 380 + Math.random() * 1200 : 900 + Math.random() * 2400);
-        }
-        const c = idx % cols;
-        const r = (idx / cols) | 0;
-        const x = c * cellW + cellW / 2;
-        const y = r * cellH + cellH / 2;
-
-        // interpolate dim -> accent by intensity, plus brightness
-        const k = Math.min(1, v);
-        const rr = Math.round(dim[0] + (acc[0] - dim[0]) * k);
-        const gg = Math.round(dim[1] + (acc[1] - dim[1]) * k);
-        const bb = Math.round(dim[2] + (acc[2] - dim[2]) * k);
-        const alpha = isGlobe ? 0.35 + 0.65 * k : 0.5;
-        ctx.globalAlpha = alpha;
-        if (v > 0.78) {
-          ctx.shadowColor = `rgb(${acc[0]},${acc[1]},${acc[2]})`;
-          ctx.shadowBlur = 7;
-        } else {
-          ctx.shadowBlur = 0;
-        }
-        ctx.fillStyle = `rgb(${rr},${gg},${bb})`;
-        ctx.fillText(GLYPHS[glyph[idx]], x, y);
-      }
-      ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0;
+      glyphAttr.needsUpdate = true;
     }
 
+    const clock = new THREE.Clock();
     let raf = 0;
-    let last = 0;
-    function loop(t: number) {
-      if (t - last > 38) { // ~26fps for a chunky ASCII feel
-        draw(t);
-        last = t;
-      }
-      raf = requestAnimationFrame(loop);
+    function frame() {
+      const dt = clock.getDelta();
+      spinner.rotation.y += dt * 0.07;
+      px += (tx - px) * 0.04;
+      py += (ty - py) * 0.04;
+      camera.position.x = px * 2;
+      camera.position.y = 2.75 + py * 1.5;
+      camera.lookAt(galaxy.position.x * 0.5, 0, 0);
+      if (++morphTick % 6 === 0) morph();
+      renderer.render(scene, camera);
+      raf = requestAnimationFrame(frame);
     }
+    function start() { if (!raf) { clock.getDelta(); raf = requestAnimationFrame(frame); } }
+    function stop() { cancelAnimationFrame(raf); raf = 0; }
 
-    function start() {
-      resize();
-      if (reduce) { draw(1); return; }
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(loop);
-    }
+    if (reduce) renderer.render(scene, camera);
+    else start();
 
-    const ro = new ResizeObserver(() => resize());
+    const ro = new ResizeObserver(() => { layout(); if (reduce) renderer.render(scene, camera); });
     ro.observe(canvas);
-    start();
 
-    // pause when off-screen to save cycles
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) {
         if (reduce) return;
-        if (e.isIntersecting) { if (!raf) { raf = requestAnimationFrame(loop); } }
-        else { cancelAnimationFrame(raf); raf = 0; }
+        if (e.isIntersecting) start(); else stop();
       }
     }, { threshold: 0 });
     io.observe(canvas);
+
+    const mo = new MutationObserver(() => { applyTheme(); if (reduce) renderer.render(scene, camera); });
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   }
 </script>

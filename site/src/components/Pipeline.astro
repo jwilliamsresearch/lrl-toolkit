@@ -1,13 +1,13 @@
 ---
 const stages = [
-  { i: '01', name: 'ingest', desc: 'Raw sharded corpus + provenance records, pulled from 9 LRL source connectors.' },
-  { i: '02', name: 'clean', desc: 'Deduped, language-filtered, normalized text with a generated data card.' },
-  { i: '03', name: 'tokenizer', desc: 'Base tokenizer extended for the target script — fertility reported.' },
+  { i: '01', name: 'ingest', desc: 'Raw sharded corpus + provenance records, pulled from 10 LRL source connectors.' },
+  { i: '02', name: 'clean', desc: 'Deduped, GlotLID language-filtered, normalized text with a generated data card.' },
+  { i: '03', name: 'tokenizer', desc: 'Base tokenizer extended for the target script, fertility reported.' },
   { i: '04', name: 'pretrain', desc: 'Continued pretraining on a strong multilingual base (LoRA / QLoRA adapter).' },
-  { i: '··', name: 'convdata', desc: 'Reviewed chat pairs: translate + synthesize + native-speaker review.', aux: true },
+  { i: '··', name: 'convdata', desc: 'Chat pairs four ways: translate, native instruction sets, synthesize, review.', aux: true },
   { i: '05', name: 'finetune', desc: 'Instruction-tuned chat model via TRL (SFT ± DPO).' },
-  { i: '06', name: 'evaluate', desc: 'Model report card: held-out perplexity, chrF, Belebele, LLM judge.' },
-  { i: '07', name: 'export', desc: 'Merged / quantized weights (GGUF · Ollama) + a Hugging Face model card.' },
+  { i: '06', name: 'evaluate', desc: 'Coverage-aware report card: base-vs-adapted deltas, a universal native-cloze metric, Belebele / MMLU / chrF where they exist, bootstrap CIs.' },
+  { i: '07', name: 'export', desc: 'License auto-resolved, merged / quantized weights (GGUF · Ollama) + a model card.' },
 ];
 ---
 <section class="section" id="pipeline">

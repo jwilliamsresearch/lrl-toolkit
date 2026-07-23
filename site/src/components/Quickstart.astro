@@ -22,12 +22,24 @@ const tabs = [
     ],
   },
   {
+    id: 'addlang',
+    label: 'Add a language',
+    lines: [
+      { c: '# 1. drop a profile: configs/languages/mylang.yaml' },
+      { c: '#    display_name · iso639_3 · scripts · normalization' },
+      { c: '# 2. FineWeb-2 + Aya (where covered) wire in automatically' },
+      { p: 'lrl sources list mylang', c: '# verify the resolved catalog' },
+      { p: 'lrl init mylang --base-model qwen3-1.7b' },
+      { p: 'lrl run -c projects/mylang.yaml' },
+    ],
+  },
+  {
     id: 'gpu',
     label: 'GPU · CUDA',
     lines: [
       { c: '# install a CUDA build of torch first, then the extras' },
       { p: 'pip install torch torchvision \\' },
-      { p: '  --index-url https://download.pytorch.org/whl/cu128' },
+      { p: '  --index-url https://download.pytorch.org/whl/cu126' },
       { p: 'pip install -e ".[train]"' },
       { p: 'python -c "import torch; print(torch.cuda.is_available())"' },
     ],
@@ -92,7 +104,7 @@ const tabs = [
       </div>
 
       <div class="qs-foot">
-        <b>Not on PyPI yet</b> — alpha (M5). Extras: <b>.[data]</b> ingestion · <b>.[train]</b> training · <b>.[all]</b> both. On Windows, use a venv at a short path.
+        <b>Not on PyPI yet</b> (alpha). Extras: <b>.[data]</b> ingestion · <b>.[train]</b> training · <b>.[all]</b> both. On Windows, use a venv at a short path.
       </div>
     </div>
   </div>
