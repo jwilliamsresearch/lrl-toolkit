@@ -136,7 +136,7 @@ class NativeSetConfig(BaseModel):
     )
     exclude: list[str] = Field(
         default_factory=list,
-        description="Drop rows whose source_field contains any of these substrings (e.g. 'flores').",
+        description="Drop rows whose source_field contains any of these substrings, e.g. 'flores'.",
     )
     select_field: str | None = Field(
         default=None, description="Column to filter on (e.g. 'language_code')."
@@ -178,8 +178,25 @@ class FinetuneConfig(BaseModel):
 
 
 class EvaluateConfig(BaseModel):
-    # Benchmark ids: 'perplexity', 'flores', 'belebele', 'judge', ...
-    benchmarks: list[str] = Field(default_factory=lambda: ["perplexity", "flores"])
+    # Benchmark ids from the benchmark registry: 'native_cloze', 'perplexity',
+    # 'belebele', 'global_mmlu', 'flores', 'judge'. Each self-reports whether it
+    # covers the target language; uncovered ones are recorded in the coverage
+    # matrix rather than failing.
+    benchmarks: list[str] = Field(
+        default_factory=lambda: [
+            "native_cloze",
+            "perplexity",
+            "belebele",
+            "global_mmlu",
+            "flores",
+        ]
+    )
+    limit: int = Field(default=100, ge=1, description="Max items scored per benchmark.")
+    human_review: bool = Field(
+        default=False,
+        description="Emit a native-speaker output-review queue (model responses to rate).",
+    )
+    human_review_n: int = Field(default=50, ge=1, description="Responses to queue for review.")
     model_config = {"extra": "forbid"}
 
 

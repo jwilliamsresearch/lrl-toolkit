@@ -1,5 +1,6 @@
-"""Evaluation metrics. Perplexity is implemented; MT/benchmark hooks are stubs
-that report themselves as not-yet-run so the report card is honest."""
+"""Low-level metric primitives. Perplexity lives here; the higher-level,
+coverage-aware benchmarks (native_cloze, belebele, global_mmlu, flores chrF,
+judge) are in the ``benchmarks/`` package and call into helpers there."""
 
 from __future__ import annotations
 

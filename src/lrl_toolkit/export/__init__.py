@@ -138,9 +138,13 @@ def _maybe_gguf(merged_dir: Path, quantize: list[str]) -> dict:
 
 
 def _load_evals(path: Path) -> dict | None:
+    """Load the evaluate stage's human-readable per-benchmark summary for the model
+    card. Prefers the coverage-aware 'summary' (name -> readable string); falls back
+    to 'results' for older report cards."""
     if path.exists():
         try:
-            return read_json(path).get("results")
+            report = read_json(path)
+            return report.get("summary") or report.get("results")
         except Exception:
             return None
     return None

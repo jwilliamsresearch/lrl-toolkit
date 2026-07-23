@@ -32,7 +32,7 @@ def _project(tmp_path, tiny_model, **overrides):
             "review": False,
         },
         "finetune": {"method": "qlora", "max_steps": 2, "max_seq_len": 64},
-        "evaluate": {"benchmarks": ["perplexity"]},
+        "evaluate": {"benchmarks": ["native_cloze", "perplexity"]},
     }
     data.update(overrides)
     p = tmp_path / "m2.yaml"
@@ -85,13 +85,22 @@ def test_sft_finetune_trains_on_mock_pairs(tmp_path, tiny_model, monkeypatch):
     assert (proj.stage_dir("finetune") / "adapter").is_dir()
 
 
-def test_evaluate_computes_perplexity(tmp_path, tiny_model):
+def test_evaluate_reports_coverage_and_perplexity(tmp_path, tiny_model):
     proj = _project(tmp_path, tiny_model)
     run_pipeline(proj, stages=["ingest", "clean", "tokenizer", "pretrain"])
     run_single_stage(proj, "evaluate")
     report = read_json(proj.stage_dir("evaluate") / "report_card.json")
+
+    # Coverage matrix is emitted; intrinsic metrics apply to every language.
+    cov = report["coverage_matrix"]
+    assert cov["perplexity"]["available"] is True
+    assert cov["native_cloze"]["available"] is True
+
+    # Perplexity measured on the adapted model, and (by design) with no base delta.
     ppl = report["results"]["perplexity"]
-    assert isinstance(ppl["value"], float) and ppl["value"] > 0
+    assert isinstance(ppl["adapted"]["value"], float) and ppl["adapted"]["value"] > 0
+    assert ppl["delta"] is None  # token-level PPL not comparable across tokenizers
+    assert report["summary"]["perplexity"].startswith("adapted=")
 
 
 def test_export_merges_adapter_and_writes_card(tmp_path, tiny_model):

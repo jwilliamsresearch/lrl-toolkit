@@ -79,9 +79,9 @@ def resolve_release_license(provenance: list[ProvenanceRecord]) -> ResolvedLicen
     if blocked:
         names = ", ".join(sorted(r.source for r in licensed if _norm(r.license or "") in blocked))
         raise LicenseConflictError(
-            f"Source(s) under a non-derivative/non-commercial license ({', '.join(sorted(blocked))}) "
-            f"cannot be reconciled into a released model: {names}. Remove these sources or obtain "
-            "explicit permission before export."
+            f"Source(s) under a non-derivative/non-commercial license "
+            f"({', '.join(sorted(blocked))}) cannot be reconciled into a released model: {names}. "
+            "Remove these sources or obtain explicit permission before export."
         )
 
     share_alike = distinct & _SHARE_ALIKE
@@ -94,20 +94,20 @@ def resolve_release_license(provenance: list[ProvenanceRecord]) -> ResolvedLicen
     unknown = distinct - _SHARE_ALIKE - _PERMISSIVE - _PUBLIC_DOMAIN - _BLOCKED
     if unknown:
         raise LicenseConflictError(
-            f"Unclassified license(s) {sorted(unknown)} — add them to licensing.py's classification "
-            "tables (as share-alike/permissive/public-domain/blocked) before export can proceed."
+            f"Unclassified license(s) {sorted(unknown)} — add them to licensing.py's "
+            "classification tables (share-alike/permissive/public-domain/blocked) before export."
         )
 
     if share_alike:
         sa = next(iter(share_alike))
-        canonical = next(r.license for r in licensed if _norm(r.license or "") == sa)  # type: ignore[arg-type]
+        canonical = next(r.license for r in licensed if _norm(r.license or "") == sa)  # type: ignore
         return ResolvedLicense(
             license=canonical,
             rationale=(
                 f"{canonical} is the strictest (share-alike) license among this model's sources. "
-                "Share-alike requires derivative works to carry the same license; every other source "
-                "here is attribution-only and is satisfied by attribution, so the whole model is "
-                f"released under {canonical} to honor all sources at once."
+                "Share-alike requires derivative works to carry the same license; every other "
+                "source here is attribution-only and is satisfied by attribution, so the whole "
+                f"model is released under {canonical} to honor all sources at once."
             ),
             attributions=attributions,
         )

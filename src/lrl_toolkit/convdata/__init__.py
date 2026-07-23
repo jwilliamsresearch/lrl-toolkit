@@ -71,7 +71,9 @@ class ConvDataStage(Stage):
         for ns in native_sources:
             count = 0
             for ex in load_native_set(ns):
-                pairs.append(chat_pair(ex["instruction"], ex["response"], source=f"native:{ns.repo}"))
+                pairs.append(
+                    chat_pair(ex["instruction"], ex["response"], source=f"native:{ns.repo}")
+                )
                 count += 1
             log.info("[convdata] loaded %d native pairs from %s", count, ns.repo)
 

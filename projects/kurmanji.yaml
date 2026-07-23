@@ -43,7 +43,14 @@ finetune:
   epochs: 3
 
 evaluate:
-  benchmarks: [perplexity]   # flores dropped (gated); add back with HF_TOKEN
+  # Coverage-aware: each self-reports whether it covers Kurmanji. Expect
+  # native_cloze + perplexity to run (universal, intrinsic), belebele/global_mmlu
+  # to report "not covered" (Kurmanji is in neither), flores "gated" (no HF_TOKEN),
+  # and judge to run via the local teacher (with its LRL-unreliability caveat).
+  benchmarks: [native_cloze, perplexity, belebele, global_mmlu, flores, judge]
+  limit: 200
+  human_review: true          # emit a native-speaker output-review queue
+  human_review_n: 50
 
 export:
   quantize: [gguf_q4_k_m]

@@ -25,6 +25,9 @@ def _project(tmp_path, offline_configs, *, language="testlang", **overrides):
         "workdir": str(tmp_path / "wd"),
         "ingest": {"sources": ["local"]},
         "clean": {"lang_id": "none", "dedup": "exact"},
+        # Intrinsic-only so the light pipeline stays offline (no benchmark-dataset
+        # config lookups over the network).
+        "evaluate": {"benchmarks": ["native_cloze", "perplexity"]},
     }
     data.update(overrides)
     p = tmp_path / "project.yaml"
