@@ -180,7 +180,14 @@ def run_pretraining(
     use_4bit = want_4bit and _can_use_4bit()
     method_used = "qlora" if use_4bit else ("lora" if method in ("lora", "qlora") else "full")
     on_cuda = torch.cuda.is_available()
-    dtype = torch.bfloat16 if (on_cuda and compute.precision == "bf16") else torch.float32
+    # bf16 needs Ampere+ tensor cores; on Turing (e.g. the Colab T4) there is no
+    # hardware bf16, so it runs slowly — fall back to fp16 there automatically.
+    eff_precision = compute.precision
+    if eff_precision == "bf16" and on_cuda and not torch.cuda.is_bf16_supported():
+        log.warning("[pretrain] this GPU has no bf16 support; using fp16 (much faster).")
+        eff_precision = "fp16"
+    dtype = torch.bfloat16 if (on_cuda and eff_precision == "bf16") else torch.float32
+    bnb_compute_dtype = torch.bfloat16 if eff_precision == "bf16" else torch.float16
 
     # Optional Unsloth fast-path (single consumer GPU: ~2x faster, less VRAM).
     backend = "hf"
@@ -207,7 +214,7 @@ def run_pretraining(
             model_kwargs["quantization_config"] = BitsAndBytesConfig(
                 load_in_4bit=True,
                 bnb_4bit_quant_type="nf4",
-                bnb_4bit_compute_dtype=torch.bfloat16,
+                bnb_4bit_compute_dtype=bnb_compute_dtype,
             )
         if want_4bit and not use_4bit:
             log.warning(
@@ -263,8 +270,8 @@ def run_pretraining(
         gradient_checkpointing=(
             compute.gradient_checkpointing and on_cuda and backend != "unsloth"
         ),
-        bf16=on_cuda and compute.precision == "bf16",
-        fp16=on_cuda and compute.precision == "fp16",
+        bf16=on_cuda and eff_precision == "bf16",
+        fp16=on_cuda and eff_precision == "fp16",
     )
 
     trainer = Trainer(

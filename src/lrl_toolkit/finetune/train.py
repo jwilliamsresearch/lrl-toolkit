@@ -63,7 +63,12 @@ def run_sft(
     use_4bit = want_4bit and _can_use_4bit()
     method_used = "qlora" if use_4bit else ("lora" if method in ("lora", "qlora") else "full")
     on_cuda = torch.cuda.is_available()
-    dtype = torch.bfloat16 if (on_cuda and compute.precision == "bf16") else torch.float32
+    # bf16 needs Ampere+; on Turing (Colab T4) fall back to fp16 automatically.
+    eff_precision = compute.precision
+    if eff_precision == "bf16" and on_cuda and not torch.cuda.is_bf16_supported():
+        log.warning("[finetune] this GPU has no bf16 support; using fp16 (much faster).")
+        eff_precision = "fp16"
+    dtype = torch.bfloat16 if (on_cuda and eff_precision == "bf16") else torch.float32
 
     model = AutoModelForCausalLM.from_pretrained(base_id, dtype=dtype, token=token)
     if len(tokenizer) != model.get_input_embeddings().weight.shape[0]:

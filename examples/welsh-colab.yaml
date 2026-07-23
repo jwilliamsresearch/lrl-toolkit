@@ -11,7 +11,7 @@
 name: welsh
 language: welsh
 base_model: qwen3-1.7b        # comfortable QLoRA fit on a 16 GB T4
-compute: consumer_gpu         # QLoRA 4-bit, gradient checkpointing
+compute: colab_t4             # bigger batch + fp16 so a T4 is actually used (not half-idle)
 
 ingest:
   sources: [wikipedia, culturax, madlad400, fineweb2]   # cleanly-licensed only

@@ -1,0 +1,14 @@
+device: cuda
+precision: bf16          # auto-downgrades to fp16 on GPUs without bf16 (e.g. Colab T4)
+quantization: 4bit
+per_device_batch_size: 8  # the default profile's batch=1 leaves a 16 GB T4 half-idle
+gradient_accumulation_steps: 2
+gradient_checkpointing: true
+use_unsloth: false
+distributed: none
+max_seq_len_cap: 1024
+notes: >
+  Tuned for a free Google Colab T4 (16 GB). Two changes vs consumer_gpu that matter
+  a lot on a T4: a much bigger batch (uses the whole GPU instead of ~6 GB), and
+  precision that resolves to fp16 (Turing has no hardware bf16). Works on stronger
+  Colab GPUs (L4 / A100) too — bf16 activates automatically there.
