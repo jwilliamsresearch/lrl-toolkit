@@ -27,7 +27,12 @@ sources:
     notes: Google MADLAD-400, document-level, audited/filtered.
   - connector: oscar
     params: {lang: cy, license: CC0-1.0}
-    notes: OSCAR-2301 — GATED; accept the license and set HF_TOKEN.
+    notes: >
+      OSCAR-2301 access is currently SUSPENDED by OSCAR's maintainers (checked
+      2026-07-21), independent of HF_TOKEN. Also, CC0-1.0 covers only the
+      dataset's metadata/packaging, not the underlying crawled text, which OSCAR
+      explicitly disclaims holding copyright over. Do not add to ingest.sources
+      until access is restored and the text-license caveat is reviewed.
   # --- raw Common Crawl (language-filter in the clean stage) ---
   - connector: commoncrawl
     params: {url_pattern: "cy.wikipedia.org/*", license: "Common-Crawl-ToU"}

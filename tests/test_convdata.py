@@ -1,6 +1,7 @@
 """Conversational-data generation (offline, mock teacher — no torch needed)."""
 
 import json
+from pathlib import Path
 
 import yaml
 
@@ -11,6 +12,32 @@ from lrl_toolkit.convdata.teacher import get_teacher
 from lrl_toolkit.convdata.translators import available_backends, get_translator
 from lrl_toolkit.pipeline import run_pipeline
 from lrl_toolkit.registry import load_language
+
+
+def test_prompt_teacher_batches_large_requests(monkeypatch):
+    """A single completion can't hold e.g. 40 full pairs before truncating; the
+    teacher must split large n into multiple batched calls to actually reach n."""
+    from lrl_toolkit.convdata.teacher import _GEN_BATCH_SIZE, OllamaTeacher
+
+    teacher = OllamaTeacher(model="fake")
+    calls: list[str] = []
+
+    def fake_chat(self, system, user, max_tokens=2048):
+        calls.append(user)
+        # Simulate a real backend: only ever returns up to _GEN_BATCH_SIZE pairs
+        # per completion, regardless of how many were asked for.
+        n_in_request = min(_GEN_BATCH_SIZE, 999)
+        pairs = [{"instruction": f"q{i}", "response": f"a{i}"} for i in range(n_in_request)]
+        import json
+
+        return json.dumps(pairs)
+
+    monkeypatch.setattr(OllamaTeacher, "_chat", fake_chat)
+
+    n = _GEN_BATCH_SIZE * 3  # requires multiple batches to satisfy
+    pairs = teacher.generate_pairs(n, "Welsh")
+    assert len(pairs) == n
+    assert len(calls) >= 3  # had to make multiple requests, not one
 
 
 def test_mock_teacher_generate_and_translate():
@@ -42,6 +69,57 @@ def test_unknown_translator_backend_raises():
 
     with pytest.raises(ValueError):
         get_translator("googletranslate")
+
+
+def test_degenerate_repetition_is_detected():
+    from lrl_toolkit.convdata.schema import is_degenerate, pair_is_degenerate
+
+    # The real failure observed in the Kurmanji SFT set.
+    assert is_degenerate("Şemzînan zûtirîn zûtirîn zûtirîn zûtirîn zûtirîn zûtirîn")
+    assert not is_degenerate("Ez kurdî me û ez li Kurdistanê dijîm.")
+
+    degenerate_pair = {
+        "messages": to_messages("Çima?", "zûtirîn zûtirîn zûtirîn zûtirîn zûtirîn zûtirîn")
+    }
+    normal_pair = {"messages": to_messages("Çima?", "Ji ber ku ew rast e.")}
+    assert pair_is_degenerate(degenerate_pair)
+    assert not pair_is_degenerate(normal_pair)
+
+
+def test_convdata_drops_degenerate_pairs(tmp_path, offline_configs):
+    proj = _project(
+        tmp_path,
+        offline_configs,
+        {
+            "translate": [],
+            "native_sets": [
+                {
+                    "repo": str(_write_jsonl(tmp_path, [
+                        {"inputs": "Q1", "targets": "A normal answer."},
+                        {"inputs": "Q2", "targets": "bad bad bad bad bad bad bad"},
+                    ])),
+                    "limit": 10,
+                }
+            ],
+            "review": False,
+        },
+    )
+    run_pipeline(proj, stages=["ingest", "clean", "convdata"])
+    accepted = read_jsonl(proj.stage_dir("convdata") / "accepted.jsonl")
+    assert len(accepted) == 1
+    assert instruction_of(accepted[0]) == "Q1"
+    card = read_jsonl(proj.stage_dir("convdata") / "pairs.jsonl")
+    assert len(card) == 1  # the degenerate pair never made it past dedup/filtering
+
+
+def _write_jsonl(tmp_path, rows) -> Path:
+    import json as _json
+
+    p = tmp_path / f"native_{len(rows)}_{id(rows)}.jsonl"
+    with p.open("w", encoding="utf-8") as fh:
+        for r in rows:
+            fh.write(_json.dumps(r) + "\n")
+    return p
 
 
 def test_schema_and_review_flow():

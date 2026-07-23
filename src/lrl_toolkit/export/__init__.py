@@ -12,6 +12,7 @@ import os
 import shutil
 from pathlib import Path
 
+from ..licensing import LicenseConflictError, resolve_release_license
 from ..pipeline.base import Stage, StageContext, StageResult
 from ..utils import get_logger, read_json, write_json, write_text
 
@@ -47,6 +48,11 @@ class ExportStage(Stage):
                 "before exporting. See DATA_ETHICS.md."
             )
 
+        try:
+            resolved_license = resolve_release_license(ctx.manifest.provenance)
+        except LicenseConflictError as exc:
+            raise LicenseGateError(f"Refusing to export: {exc}") from exc
+
         from ..modeling import resolve_artifacts
 
         tok_dir, adapter, kind = resolve_artifacts(ctx.project)
@@ -79,7 +85,6 @@ class ExportStage(Stage):
             packaging["ollama_modelfile"] = str(mf)
 
         # --- model card (always shipped) ---------------------------------- #
-        licenses = sorted({r.license for r in ctx.manifest.provenance if r.license})
         evals = _load_evals(ctx.project.stage_dir("evaluate") / "report_card.json")
         model_card = _render_model_card(
             project=ctx.project.name,
@@ -87,7 +92,7 @@ class ExportStage(Stage):
             base_model=model_profile.hf_id,
             model_kind=kind,
             quantize=cfg.quantize,
-            licenses=licenses,
+            resolved_license=resolved_license,
             evals=evals,
         )
         card_path = write_text(out_dir / "MODEL_CARD.md", model_card)
@@ -97,15 +102,21 @@ class ExportStage(Stage):
                 "packaging": packaging,
                 "quantize": cfg.quantize,
                 "push_to_hub": cfg.push_to_hub,
-                "source_licenses": licenses,
+                "model_license": resolved_license.license,
+                "model_license_rationale": resolved_license.rationale,
+                "attributions": resolved_license.attributions,
                 "evals": evals,
             },
         )
-        log.info("[export] license gate passed; model_kind=%s", kind)
+        log.info(
+            "[export] license gate passed; model_kind=%s license=%s",
+            kind,
+            resolved_license.license,
+        )
 
         return StageResult(
             outputs=[ctx.relpath(card_path), ctx.relpath(plan_path)],
-            metrics={"model_kind": kind, "licenses": licenses},
+            metrics={"model_kind": kind, "license": resolved_license.license},
         )
 
 
@@ -145,11 +156,13 @@ def _render_modelfile(model_ref: str, language: str) -> str:
 
 
 def _render_model_card(
-    *, project, language, base_model, model_kind, quantize, licenses, evals
+    *, project, language, base_model, model_kind, quantize, resolved_license, evals
 ) -> str:
-    licenses_str = ", ".join(licenses) if licenses else "see source catalog"
     quant_str = ", ".join(quantize) if quantize else "none"
     evals_str = "\n".join(f"- **{k}:** {v}" for k, v in (evals or {}).items()) or "- (none run)"
+    attributions_str = (
+        "\n".join(f"- {a}" for a in resolved_license.attributions) or "- (no sources recorded)"
+    )
     return f"""# {project} — {language} language model
 
 Built with [lrl-toolkit](https://github.com/lrl-toolkit/lrl-toolkit).
@@ -158,7 +171,7 @@ Built with [lrl-toolkit](https://github.com/lrl-toolkit/lrl-toolkit).
 - **Base model:** `{base_model}`
 - **Adaptation:** {model_kind} (continued pretraining / SFT via LoRA)
 - **Quantization:** {quant_str}
-- **Source data licenses:** {licenses_str}
+- **License:** {resolved_license.license}
 
 ## Evaluation
 
@@ -177,6 +190,11 @@ native-speaker review. See the project's data card for corpus details.
 
 ## Provenance & licensing
 
-This model derives from data under: {licenses_str}. You are responsible for
-honoring those licenses and any attribution requirements.
+**This model is released under {resolved_license.license}.**
+
+{resolved_license.rationale}
+
+### Source attribution
+
+{attributions_str}
 """

@@ -4,7 +4,7 @@
 # token and re-add them + the flores benchmark to widen coverage.
 name: kurmanji
 language: kurmanji
-base_model: qwen2.5-1.5b
+base_model: qwen3-1.7b     # newer Apache-2.0 base; same VRAM/time class as qwen2.5-1.5b
 compute: consumer_gpu
 seed: 42
 
@@ -23,20 +23,19 @@ tokenizer:
 
 pretrain:
   method: qlora
-  epochs: 1
-  max_steps: 3000        # cap: ~14h on the 4080 (full epoch would be ~5 days). Raise later for a bigger run.
+  epochs: 1                # full epoch now, no step cap (~28k steps, ~6.4 days on the 4080)
   seq_len: 2048
 
 convdata:
   translate: [dolly]         # open instruction set, translated En->kmr via NLLB
-  translate_limit: 500
+  translate_limit: 2000      # was 500; fine now that per-item translation was never the bottleneck
   translate_backend: nllb
   provider: ollama           # local teacher for synth (ToS-safe)
   model: qwen2.5:14b
   synth:
     provider: ollama
     model: qwen2.5:14b
-    n: 2000
+    n: 3000                 # now reachable: teacher.py batches requests instead of one truncated call
   review: false              # unattended run: skip the human-review gate
 
 finetune:

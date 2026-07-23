@@ -87,6 +87,12 @@ class CulturaXConnector(_HFStreamConnector):
 
 
 class OscarConnector(_HFStreamConnector):
+    """OSCAR-2301. As of 2026-07-21, access is SUSPENDED by OSCAR's maintainers
+    pending review — a token will not currently obtain access regardless of
+    accepted terms. Separately, CC0-1.0 (as recorded in profile params) covers
+    only the dataset's metadata/packaging; OSCAR explicitly disclaims holding
+    copyright over the underlying crawled text. Re-verify both before use."""
+
     name = "oscar"
     gated = True
 

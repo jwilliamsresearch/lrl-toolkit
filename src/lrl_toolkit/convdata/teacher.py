@@ -31,6 +31,13 @@ _DEFAULT_MODELS = {
 }
 _OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 
+# A single completion can only hold so many full instruction-response pairs
+# before its output token budget truncates the JSON array mid-object. Large
+# requests (n in the thousands) are split into batches this size instead of
+# one all-at-once request that would silently come back mostly empty.
+_GEN_BATCH_SIZE = 15
+_GEN_MAX_TOKENS = 4096
+
 
 class BaseTeacher(abc.ABC):
     provider: str
@@ -106,12 +113,12 @@ class _PromptTeacher(BaseTeacher):
         )
         return self._chat(system, text, max_tokens=1024).strip()
 
-    def generate_pairs(
-        self, n: int, target_language: str, contexts: list[str] | None = None
+    def _generate_batch(
+        self, batch_n: int, target_language: str, contexts: list[str] | None
     ) -> list[dict]:
         ctx = ""
         if contexts:
-            joined = "\n---\n".join(c[:500] for c in contexts[:5])
+            joined = "\n---\n".join(c[:500] for c in contexts)
             ctx = f"\nGround the topics in this sample text:\n{joined}\n"
         system = (
             f"You generate high-quality instruction-tuning data in {target_language}. "
@@ -119,16 +126,50 @@ class _PromptTeacher(BaseTeacher):
             "helpful responses, entirely in the target language."
         )
         user = (
-            f"Generate {n} instruction-response pairs.{ctx}\n"
+            f"Generate {batch_n} instruction-response pairs.{ctx}\n"
             'Return ONLY a JSON array of objects with keys "instruction" and "response".'
         )
-        raw = self._chat(system, user, max_tokens=4096)
-        pairs = _extract_json_array(raw)
+        raw = self._chat(system, user, max_tokens=_GEN_MAX_TOKENS)
         return [
             {"instruction": p["instruction"], "response": p["response"]}
-            for p in pairs
+            for p in _extract_json_array(raw)
             if isinstance(p, dict) and p.get("instruction") and p.get("response")
         ]
+
+    def generate_pairs(
+        self, n: int, target_language: str, contexts: list[str] | None = None
+    ) -> list[dict]:
+        """Generate n pairs, batching requests since one completion can only hold
+        so many full pairs before its output token budget truncates the JSON
+        array mid-object (a single request for a large n silently returns very
+        few pairs otherwise)."""
+        collected: list[dict] = []
+        max_attempts = max(1, -(-n // _GEN_BATCH_SIZE)) * 3  # allow retries for empty batches
+        attempt = 0
+        call_idx = 0
+        while len(collected) < n and attempt < max_attempts:
+            attempt += 1
+            batch_n = min(_GEN_BATCH_SIZE, n - len(collected))
+            batch_ctx = None
+            if contexts:
+                # Rotate the context window per call so batches ground on
+                # different corpus snippets instead of the same first few.
+                offset = (call_idx * 5) % len(contexts)
+                batch_ctx = (contexts[offset:] + contexts[:offset])[:5]
+            call_idx += 1
+            batch = self._generate_batch(batch_n, target_language, batch_ctx)
+            if not batch:
+                log.warning("[teacher] batch %d produced 0 parseable pairs; retrying", attempt)
+                continue
+            collected.extend(batch)
+        if len(collected) < n:
+            log.warning(
+                "[teacher] only generated %d/%d requested pairs after %d attempts",
+                len(collected),
+                n,
+                attempt,
+            )
+        return collected[:n]
 
 
 class OllamaTeacher(_PromptTeacher):

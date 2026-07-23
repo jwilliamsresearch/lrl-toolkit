@@ -14,7 +14,7 @@ from ..pipeline.base import Stage, StageContext, StageResult
 from ..utils import get_logger, write_json
 from . import review as review_mod
 from .instruction_sets import load_instruction_set, load_native_set
-from .schema import chat_pair, instruction_of, write_jsonl
+from .schema import chat_pair, instruction_of, pair_is_degenerate, write_jsonl
 from .teacher import get_teacher
 from .translators import get_translator
 
@@ -84,14 +84,19 @@ class ConvDataStage(Stage):
                 pairs.append(chat_pair(p["instruction"], p["response"], source="synth"))
             log.info("[convdata] synthesized %d pairs", len(synth_pairs))
 
-        # --- dedup by instruction --------------------------------------- #
+        # --- dedup by instruction + drop repetition-degenerate pairs ----- #
         seen: set[str] = set()
         deduped: list[dict] = []
+        n_degenerate = 0
         for p in pairs:
             key = instruction_of(p).strip().lower()
-            if key and key not in seen:
-                seen.add(key)
-                deduped.append(p)
+            if not key or key in seen:
+                continue
+            if pair_is_degenerate(p):
+                n_degenerate += 1
+                continue
+            seen.add(key)
+            deduped.append(p)
 
         # --- review queue ----------------------------------------------- #
         queue = review_mod.build_queue(deduped)
@@ -113,6 +118,7 @@ class ConvDataStage(Stage):
             "review": cfg.review,
             "counts": {
                 "generated": len(pairs),
+                "degenerate_dropped": n_degenerate,
                 "deduped": len(deduped),
                 "accepted": len(accepted),
             },
