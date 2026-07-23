@@ -63,10 +63,11 @@ def run_sft(
     use_4bit = want_4bit and _can_use_4bit()
     method_used = "qlora" if use_4bit else ("lora" if method in ("lora", "qlora") else "full")
     on_cuda = torch.cuda.is_available()
-    # bf16 needs Ampere+; on Turing (Colab T4) fall back to fp16 automatically.
+    # bf16 needs Ampere+ (capability >= 8.0); on Turing (Colab T4) it is only emulated and
+    # is_bf16_supported() wrongly returns True — check capability directly and use fp16.
     eff_precision = compute.precision
-    if eff_precision == "bf16" and on_cuda and not torch.cuda.is_bf16_supported():
-        log.warning("[finetune] this GPU has no bf16 support; using fp16 (much faster).")
+    if eff_precision == "bf16" and on_cuda and torch.cuda.get_device_capability()[0] < 8:
+        log.warning("[finetune] GPU is pre-Ampere (no hardware bf16); using fp16 (much faster).")
         eff_precision = "fp16"
     dtype = torch.bfloat16 if (on_cuda and eff_precision == "bf16") else torch.float32
 

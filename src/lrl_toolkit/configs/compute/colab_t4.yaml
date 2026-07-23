@@ -1,5 +1,5 @@
 device: cuda
-precision: bf16          # auto-downgrades to fp16 on GPUs without bf16 (e.g. Colab T4)
+precision: fp16          # T4 (Turing) has no hardware bf16 — fp16 uses tensor cores, ~10x faster
 quantization: 4bit
 per_device_batch_size: 4  # the default profile's batch=1 leaves a 16 GB T4 half-idle;
                           # 4 is a safe middle ground for large-vocab models (Qwen3 ~151k)
